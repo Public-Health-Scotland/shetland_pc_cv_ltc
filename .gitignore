@@ -77,3 +77,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# HTML outputs
+*.html
