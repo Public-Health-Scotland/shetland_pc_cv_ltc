@@ -1,0 +1,105 @@
+---
+title: "Shetland CV LTC"
+author: "James McMahon and Sue Wakely"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  html_document:
+    css: phs_style.css
+    toc: true
+    toc_float: true
+keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Copy in the PHS style CSS file if required
+if (!file.exists(file.path(getwd(), "phs_style.css"))) {
+  phstemplates::add_stylecss(getwd(), auto_open = FALSE, shinycss = FALSE)
+}
+```
+
+# Prevalence
+```{r get_prev_data, include=FALSE}
+source("prevalence.R")
+```
+
+```{r plot1}
+clean_data |>
+  filter(is.na(DateOfDeath)) |>
+  filter(str_starts(EventType, "Record of Diagnosis")) |>
+  filter(EventDate >= as.Date("2021-01-01")) |>
+  group_by(PatientID) |>
+  mutate(Diagnosis_type = if_else(EventDate == min(EventDate), "First", "Subsequent")) |>
+  ungroup() |>
+  count(Diagnosis_type, EventDate) |>
+  ggplot(aes(x = EventDate, y = n, fill = Diagnosis_type)) +
+  scale_fill_discrete() +
+  geom_col() +
+  scale_x_date(breaks = breaks_pretty(10), labels = label_date("%b %y")) +
+  theme_minimal() +
+  labs(
+    title = "Diagnosis events per day over time",
+    x = "Event Date",
+    y = "Event count"
+  )
+```
+```{r plot2}
+# List size recent 3 year
+monthly_summary |>
+  filter(census_date >= as.Date("2021-11-01")) |>
+  ggplot(aes(x = census_date, y = list_prev * 1000)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(
+    breaks = breaks_pretty(),
+    labels = label_number(),
+    limits = c(0, NA)
+  ) +
+  scale_x_date(
+    breaks = breaks_pretty(10),
+    labels = label_date("%b %y")
+  ) +
+  theme_minimal() +
+  labs(
+    title = "CV LTC prevalence over time",
+    subtitle = "Prevalence is per 1000 list size",
+    x = "Census date",
+    y = "Prevalence"
+  )
+```
+
+```{r plot3}
+# Full using populations
+monthly_summary |>
+  ggplot(aes(x = census_date)) +
+  geom_line(aes(y = pop_prev * 1000)) +
+  scale_y_continuous(
+    breaks = breaks_pretty(),
+    labels = label_number(),
+    limits = c(0, NA)
+  ) +
+  scale_x_date(
+    breaks = breaks_pretty(10),
+    labels = label_date("%b %y")
+  ) +
+  theme_minimal() +
+  labs(
+    title = "CV LTC prevalence over time",
+    subtitle = "Prevalence is per 1000 population",
+    x = "Census date",
+    y = "Prevalence"
+  )
+```
+
+```{r plot4}
+library(NHSRplotthedots)
+monthly_summary |>
+  filter(census_date >= as.Date("2021-11-01")) |>
+  ptd_spc(
+    value_field = list_prev,
+    date_field = census_date,
+    rebase = as.Date(c("2022-01-01","2022-06-01", "2023-01-01","2023-06-01", "2024-01-01", "2024-06-01")),
+    improvement_direction = "decrease"
+  )
+```
