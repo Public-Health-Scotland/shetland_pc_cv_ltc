@@ -6,7 +6,7 @@ library(stringr)
 library(lubridate)
 library(phsopendata)
 library(phsstyles)
-library(arrow)
+library(nanoparquet)
 library(fs)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
@@ -15,7 +15,7 @@ clean_data <- read_parquet(path(dir, "data", "working", "nov_24_clean_data.parqu
 
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
-  filter(EventDate >= as.Date("2021-11-01")) |>
+  #filter(EventDate >= as.Date("2021-11-01")) |>
   filter(str_starts(EventType, "Record of Diagnosis")) |>
   group_by(PatientID) |>
   summarise(
@@ -32,7 +32,7 @@ shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_
 # Create a tibble of monthly dates
 months <- tibble(
   census_date = seq.Date(
-    from = as.Date("2021-11-01"),
+    from = as.Date("2000-01-01"),
     to = as.Date("2024-11-01"),
     by = "month"
   )
