@@ -2,13 +2,19 @@ library(dplyr)
 library(tidyr)
 library(lubridate)
 library(readr)
-library(arrow)
+library(nanoparquet)
 library(fs)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
+# Print the files in the folder to check
+dir_ls(path(dir, "data", "raw")) |> 
+  path_file()
+
+data_file_name <- "2024-11-18 - LIST CV LTC - extract 2.zip"
+
 raw_data <- read_csv(
-  file = path(dir, "data", "raw", "2024-11-04 - LIST CV LTC pseudo-anon extract.zip"), 
+  file = path(dir, "data", "raw", data_file_name), 
   col_types = cols(
       PatientID = col_integer(),
       PracticeID = col_integer(),
@@ -27,8 +33,11 @@ cleaned_filtered <- raw_data |>
   # We only need the latest ~4 years 
   filter(between(EventYear, 1901, year(today())))
 
-write_parquet(cleaned_filtered, path(dir, "data", "working", "nov_24_clean_data.parquet"), compression = "zstd")
+write_parquet(
+  cleaned_filtered,
+  path(dir, "data", "working", "nov_24_clean_data.parquet"),
+  compression = "zstd"
+)
 
 # Clean the environment
 rm(list = ls())
-
