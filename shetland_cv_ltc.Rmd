@@ -11,7 +11,7 @@ keep_md: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # Copy in the PHS style CSS file if required
 if (!file.exists(file.path(getwd(), "phs_style.css"))) {
@@ -19,32 +19,19 @@ if (!file.exists(file.path(getwd(), "phs_style.css"))) {
 }
 ```
 
-# Prevalence
+# CV disease LTC - Read Code analysis
+
+*Note that this project is a work in progress and the outputs are **not for onward sharing or distribution***
+
+## Prevalence
+
 ```{r get_prev_data, include=FALSE}
 source("prevalence.R")
 ```
 
-```{r plot1}
-clean_data |>
-  filter(is.na(DateOfDeath)) |>
-  filter(str_starts(EventType, "Record of Diagnosis")) |>
-  filter(EventDate >= as.Date("2021-01-01")) |>
-  group_by(PatientID) |>
-  mutate(Diagnosis_type = if_else(EventDate == min(EventDate), "First", "Subsequent")) |>
-  ungroup() |>
-  count(Diagnosis_type, EventDate) |>
-  ggplot(aes(x = EventDate, y = n, fill = Diagnosis_type)) +
-  scale_fill_discrete() +
-  geom_col() +
-  scale_x_date(breaks = breaks_pretty(10), labels = label_date("%b %y")) +
-  theme_minimal() +
-  labs(
-    title = "Diagnosis events per day over time",
-    x = "Event Date",
-    y = "Event count"
-  )
-```
-```{r plot2}
+The CV prevalence for the most recent three years, this is the monthly prevalence as a rate per 1,000 list size.
+
+```{r cv_prev_3_year_list}
 # List size recent 3 year
 monthly_summary |>
   filter(census_date >= as.Date("2021-11-01")) |>
@@ -62,18 +49,19 @@ monthly_summary |>
   ) +
   theme_minimal() +
   labs(
-    title = "CV LTC prevalence over time",
-    subtitle = "Prevalence is per 1000 list size",
+    title = "CV LTC prevalence in the most recent 3 years",
     x = "Census date",
-    y = "Prevalence"
+    y = "Prevalence per 1,000 list size"
   )
 ```
 
-```{r plot3}
+We can look back at the 'prevalence' across all the time, but historic data completeness is insufficient to draw any conclusions.
+
+```{r cv_prev_full_pops}
 # Full using populations
 monthly_summary |>
-  ggplot(aes(x = census_date)) +
-  geom_line(aes(y = pop_prev * 1000)) +
+  ggplot(aes(x = census_date, y = pop_prev * 1000)) +
+  geom_line() +
   scale_y_continuous(
     breaks = breaks_pretty(),
     labels = label_number(),
@@ -86,20 +74,66 @@ monthly_summary |>
   theme_minimal() +
   labs(
     title = "CV LTC prevalence over time",
-    subtitle = "Prevalence is per 1000 population",
+    subtitle = "Older data is incomplete",
     x = "Census date",
-    y = "Prevalence"
+    y = "Prevalence per 1,000 population"
   )
 ```
 
-```{r plot4}
-library(NHSRplotthedots)
+## LTC Invites
+
+Within the last three years, at each month (census date), what percentage of the patients diagnosed with CV had received an invite within the preceding 15 months.
+
+```{r ltc_invite}
+# List size recent 3 year
 monthly_summary |>
   filter(census_date >= as.Date("2021-11-01")) |>
-  ptd_spc(
-    value_field = list_prev,
-    date_field = census_date,
-    rebase = as.Date(c("2022-01-01","2022-06-01", "2023-01-01","2023-06-01", "2024-01-01", "2024-06-01")),
-    improvement_direction = "decrease"
+  ggplot(aes(x = census_date, y = ltc_invite_prop)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(
+    breaks = breaks_pretty(),
+    labels = label_percent(),
+    limits = c(0, NA)
+  ) +
+  scale_x_date(
+    breaks = breaks_pretty(10),
+    labels = label_date("%b %y")
+  ) +
+  theme_minimal() +
+  labs(
+    title = "LTC Invite Percent",
+    subtitle = str_wrap("The percentage of patients with a CV diagnosis who had an Invite in the 15 months preceding the census date", width = 50),
+    x = "Census date",
+    y = "Percent of CV diagnosed patients"
+  )
+```
+
+## LTC Attendances
+
+Within the last three years, at each month (census date), what percentage of the patients diagnosed with CV had attended within the preceding 15 months.
+
+```{r ltc_attend}
+# List size recent 3 year
+monthly_summary |>
+  filter(census_date >= as.Date("2021-11-01")) |>
+  ggplot(aes(x = census_date, y = ltc_attend_prop)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(
+    breaks = breaks_pretty(),
+    labels = label_percent(),
+    limits = c(0, NA)
+  ) +
+  scale_x_date(
+    breaks = breaks_pretty(10),
+    labels = label_date("%b %y")
+  ) +
+  theme_minimal() +
+  labs(
+    title = "LTC Attendance Percent",
+    subtitle = str_wrap("The percentage of patients with a CV diagnosis who had an Attendance in the 15 months preceding the census date", width = 50),
+    x = "Census date",
+    y = "Percent of CV diagnosed patients"
   )
 ```
