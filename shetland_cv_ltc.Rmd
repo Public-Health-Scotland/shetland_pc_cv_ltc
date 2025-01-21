@@ -21,6 +21,7 @@ if (!file.exists(file.path(getwd(), "phs_style.css"))) {
 
 ```{r load_packages, include = FALSE}
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(plotly) # Create Interactive Web Graphics via 'plotly.js'
 library(scales) # Scale Functions for Visualization
 library(phsstyles) # Standard Graphic Styles for use in Public Health Scotland
 ```
@@ -39,7 +40,7 @@ The CV prevalence for the most recent three years, this is the monthly prevalenc
 
 ```{r cv_prev_3_year_list}
 # List size recent 3 year
-monthly_summary |>
+cv_prev_3_year_list <- monthly_summary |>
   filter(census_date >= as.Date("2021-11-01")) |>
   ggplot(aes(x = census_date, y = list_prev * 1000)) +
   geom_line() +
@@ -59,13 +60,15 @@ monthly_summary |>
     x = "Census date",
     y = "Prevalence per 1,000 list size"
   )
+
+ggplotly(cv_prev_3_year_list)
 ```
 
 We can look back at the 'prevalence' across all the time, but historic data completeness is insufficient to draw any conclusions.
 
 ```{r cv_prev_full_pops}
 # Full using populations
-monthly_summary |>
+cv_prev_full_pops <- monthly_summary |>
   ggplot(aes(x = census_date, y = pop_prev * 1000)) +
   geom_line() +
   scale_y_continuous(
@@ -84,6 +87,8 @@ monthly_summary |>
     x = "Census date",
     y = "Prevalence per 1,000 population"
   )
+
+ggplotly(cv_prev_full_pops)
 ```
 
 ## LTC Invites
@@ -92,7 +97,7 @@ Within the last three years, at each month (census date), what percentage of the
 
 ```{r ltc_invite}
 # List size recent 3 year
-monthly_summary |>
+ltc_invite <- monthly_summary |>
   filter(census_date >= as.Date("2021-11-01")) |>
   ggplot(aes(x = census_date, y = ltc_invite_prop)) +
   geom_line() +
@@ -113,6 +118,8 @@ monthly_summary |>
     x = "Census date",
     y = "Percent of CV diagnosed patients"
   )
+
+ggplotly(ltc_invite)
 ```
 
 ## LTC Attendances
@@ -121,7 +128,7 @@ Within the last three years, at each month (census date), what percentage of the
 
 ```{r ltc_attend}
 # List size recent 3 year
-monthly_summary |>
+ltc_attend <- monthly_summary |>
   filter(census_date >= as.Date("2021-11-01")) |>
   ggplot(aes(x = census_date, y = ltc_attend_prop)) +
   geom_line() +
@@ -142,5 +149,6 @@ monthly_summary |>
     x = "Census date",
     y = "Percent of CV diagnosed patients"
   )
-```
 
+ggplotly(ltc_attend)
+```
