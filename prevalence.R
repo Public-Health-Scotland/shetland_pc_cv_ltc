@@ -19,13 +19,13 @@ first_diag <- clean_data |>
 
 # LTC Invite
 ltc_invite <- clean_data |>
-  filter(str_ends(EventType, "LTC Invite")) |> 
-  select(PatientID, PracticeID, EventDate) |> 
+  filter(str_ends(EventType, "LTC Invite")) |>
+  select(PatientID, PracticeID, EventDate) |>
   rename(ltc_invite_date = EventDate)
 
 ltc_attend <- clean_data |>
-  filter(str_ends(EventType, "LTC Attendance")) |> 
-  select(PatientID, PracticeID, EventDate) |> 
+  filter(str_ends(EventType, "LTC Attendance")) |>
+  select(PatientID, PracticeID, EventDate) |>
   rename(ltc_attend_date = EventDate)
 
 # Read in population estimates for Shetland
@@ -48,18 +48,20 @@ ltc_invite_census <- left_join(
   months |>
     mutate(census_date_minus15 = census_date - months(15)),
   by = join_by(within(ltc_invite_date, ltc_invite_date, census_date_minus15, census_date))
-) |> 
+) |>
   # We only need one record per census date per patient
-  select(PatientID, census_date, ltc_invite_date) |> 
+  select(PatientID, census_date, ltc_invite_date) |>
   distinct(.keep_all = TRUE)
 
 ltc_invite_attend_census <- left_join(
-  ltc_invite_census |> 
+  ltc_invite_census |>
     mutate(ltc_invite_date_plus60 = ltc_invite_date + days(60)),
   ltc_attend,
-  by = join_by(PatientID == PatientID,
-               within(ltc_invite_date, ltc_invite_date_plus60, ltc_attend_date, ltc_attend_date))
-) |> 
+  by = join_by(
+    PatientID == PatientID,
+    within(ltc_invite_date, ltc_invite_date_plus60, ltc_attend_date, ltc_attend_date)
+  )
+) |>
   select(PatientID, census_date, ltc_invite_date, ltc_attend_date)
 
 ltc_attend_census <- left_join(
@@ -67,9 +69,9 @@ ltc_attend_census <- left_join(
   months |>
     mutate(census_date_minus15 = census_date - months(15)),
   by = join_by(within(ltc_attend_date, ltc_attend_date, census_date_minus15, census_date))
-) |> 
+) |>
   # We only need one record per census date per patient
-  select(PatientID, census_date, ltc_attend_date) |> 
+  select(PatientID, census_date, ltc_attend_date) |>
   distinct(.keep_all = TRUE)
 
 first_diag_census <- left_join(
@@ -101,7 +103,7 @@ monthly_summary <- census_data |>
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
     .groups = "drop"
   ) |>
-  mutate(census_year = year(census_date)) |> 
+  mutate(census_year = year(census_date)) |>
   left_join(shetland_pops, by = join_by(closest(census_year >= pop_year))) |>
   left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date))) |>
   mutate(

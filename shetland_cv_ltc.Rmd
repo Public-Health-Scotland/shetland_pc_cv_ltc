@@ -143,3 +143,4 @@ monthly_summary |>
     y = "Percent of CV diagnosed patients"
   )
 ```
+
