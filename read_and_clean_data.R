@@ -1,9 +1,9 @@
-library(dplyr)
-library(tidyr)
-library(lubridate)
-library(readr)
-library(nanoparquet)
-library(fs)
+library(dplyr) # A Grammar of Data Manipulation
+library(tidyr) # Tidy Messy Data
+library(lubridate) # Make Dealing with Dates a Little Easier
+library(readr) # Read Rectangular Text Data
+library(nanoparquet) # Read and Write 'Parquet' Files
+library(fs) # Cross-Platform File System Operations Based on 'libuv'
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 

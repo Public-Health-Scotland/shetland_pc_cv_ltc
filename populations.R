@@ -1,7 +1,7 @@
-library(readr)
-library(dplyr)
-library(fs)
-library(nanoparquet)
+library(readr) # Read Rectangular Text Data
+library(dplyr) # A Grammar of Data Manipulation
+library(fs) # Cross-Platform File System Operations Based on 'libuv'
+library(nanoparquet) # Read and Write 'Parquet' Files
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 

@@ -1,13 +1,8 @@
-library(dplyr)
-library(readr)
-library(ggplot2)
-library(scales)
-library(stringr)
-library(lubridate)
-library(phsopendata)
-library(phsstyles)
-library(nanoparquet)
-library(fs)
+library(dplyr) # A Grammar of Data Manipulation
+library(stringr) # Simple, Consistent Wrappers for Common String Operations
+library(lubridate) # Make Dealing with Dates a Little Easier
+library(nanoparquet) # Read and Write 'Parquet' Files
+library(fs) # Cross-Platform File System Operations Based on 'libuv'
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 

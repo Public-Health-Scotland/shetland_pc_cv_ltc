@@ -1,8 +1,8 @@
-library(phsopendata)
-library(dplyr)
-library(lubridate)
-library(fs)
-library(nanoparquet)
+library(phsopendata) # Extract Open Data from opendata.nhs.scot
+library(dplyr) # A Grammar of Data Manipulation
+library(lubridate) # Make Dealing with Dates a Little Easier
+library(fs) # Cross-Platform File System Operations Based on 'libuv'
+library(nanoparquet) # Read and Write 'Parquet' Files
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 

@@ -19,6 +19,12 @@ if (!file.exists(file.path(getwd(), "phs_style.css"))) {
 }
 ```
 
+```{r load_packages, include = FALSE}
+library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
+library(scales) # Scale Functions for Visualization
+library(phsstyles) # Standard Graphic Styles for use in Public Health Scotland
+```
+
 # CV disease LTC - Read Code analysis
 
 *Note that this project is a work in progress and the outputs are **not for onward sharing or distribution***
