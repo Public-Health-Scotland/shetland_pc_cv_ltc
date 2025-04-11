@@ -1,12 +1,14 @@
-library(dplyr) # A Grammar of Data Manipulation
-library(stringr) # Simple, Consistent Wrappers for Common String Operations
-library(lubridate) # Make Dealing with Dates a Little Easier
-library(nanoparquet) # Read and Write 'Parquet' Files
-library(fs) # Cross-Platform File System Operations Based on 'libuv'
+library(dplyr) 
+library(stringr) 
+library(lubridate) 
+library(nanoparquet) 
+library(fs) 
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 clean_data <- read_parquet(path(dir, "data", "working", "nov_24_clean_data.parquet"))
+
+#clean_data <- filter(clean_data, PracticeID != 3)
 
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
