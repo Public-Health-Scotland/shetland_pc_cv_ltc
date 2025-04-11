@@ -5,8 +5,6 @@ library(readr) # No used functions found
 library(writexl) # No used functions found
 library(tidyr) # %>% pivot_wider everything
 
-
-
 # Specify the path to the zip file
 zip_file <- "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-02-04 - LIST - Med Reviews.zip"
 
@@ -49,7 +47,6 @@ event_summary <- med_reviews %>%
 # Same as mutate(event_summary, TotalEvents = rowSums(select(event_summary, -DerivedStaffType)))
 event_summary <- event_summary %>%
   mutate(TotalEvents = rowSums(select(., -DerivedStaffType)))
-
 
 # Calculate the total number of events for each month
 total_by_month <- event_summary %>%
