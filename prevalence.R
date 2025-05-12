@@ -6,7 +6,7 @@ library(fs)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
-clean_data <- read_parquet(path(dir, "data", "working", "nov_24_clean_data.parquet"))
+clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parquet"))
 
 #clean_data <- filter(clean_data, PracticeID != 3)
 

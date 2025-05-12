@@ -4,6 +4,7 @@ library(lubridate) # Make Dealing with Dates a Little Easier
 library(readr) # Read Rectangular Text Data
 library(nanoparquet) # Read and Write 'Parquet' Files
 library(fs) # Cross-Platform File System Operations Based on 'libuv'
+library(readxl) # Read '.xlxs' files
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
@@ -11,19 +12,34 @@ dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 dir_ls(path(dir, "data", "raw")) |>
   path_file()
 
-data_file_name <- "2024-11-18 - LIST CV LTC - extract 2.zip"
+## Unzip the file to a temporary directory
+#temp_dir <- tempdir()
+#unzip("2025-04 Extract.zip" , exdir = temp_dir)
+
+## List the files in the unzipped directory
+#unzipped_files <- list.files(unzip_dir, full.names = TRUE)
+
+# Read the file (excel)
+#data <- read_excel(file.path(temp_dir, "2025-04-22 - LIST - CV LTC.xlsx "))
+#
+
+#data_file_name <- 025-04-22 - LIST - CV LTC.csv
 
 raw_data <- read_csv(
-  file = path(dir, "data", "raw", data_file_name),
+  file = path(dir, "data", "raw", "2025-04-22 - LIST - CV LTC.csv"),
   col_types = cols(
     PatientID = col_integer(),
     PracticeID = col_integer(),
     EventCode = col_character(),
+    DayOfBirth = col_integer(),
+    MonthOfBirth = col_integer(),
     EventDate = col_date(format = "%d/%m/%Y"),
     DateOfDeath = col_date(format = "%d/%m/%Y"),
     EventType = col_character()
   )
 )
+
+
 
 cleaned_filtered <- raw_data |>
   # 1899 dates are in a different format so will now be NA
@@ -35,7 +51,7 @@ cleaned_filtered <- raw_data |>
 
 write_parquet(
   cleaned_filtered,
-  path(dir, "data", "working", "nov_24_clean_data.parquet"),
+  path(dir, "data", "working", "apr_25_clean_data.parquet"), # will need to update every time a new extract
   compression = "zstd"
 )
 
