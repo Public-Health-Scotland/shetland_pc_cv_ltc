@@ -10,14 +10,17 @@ clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parqu
 
 #clean_data <- filter(clean_data, PracticeID != 3)
 
+
+
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
   filter(str_starts(EventType, "Record of Diagnosis")) |>
-  group_by(PatientID) |>
+  group_by(PatientID, PracticeID) |>
   summarise(
     FirstDiag = min(EventDate),
-    DateOfDeath = first(DateOfDeath)
+    DateOfDeath = first(DateOfDeath),
   )
+
 
 # LTC Invite
 ltc_invite <- clean_data |>
@@ -40,7 +43,7 @@ shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_
 months <- tibble(
   census_date = seq.Date(
     from = as.Date("2000-01-01"),
-    to = as.Date("2024-11-01"),
+    to = as.Date("2025-04-22"),
     by = "month"
   )
 )
@@ -51,8 +54,8 @@ ltc_invite_census <- left_join(
     mutate(census_date_minus15 = census_date - months(15)),
   by = join_by(within(ltc_invite_date, ltc_invite_date, census_date_minus15, census_date))
 ) |>
-  # We only need one record per census date per patient
-  select(PatientID, census_date, ltc_invite_date) |>
+  # We only need one record per census date per patient?
+  select(PatientID, PracticeID, census_date, ltc_invite_date) |>
   distinct(.keep_all = TRUE)
 
 ltc_invite_attend_census <- left_join(
@@ -61,10 +64,11 @@ ltc_invite_attend_census <- left_join(
   ltc_attend,
   by = join_by(
     PatientID == PatientID,
+   PracticeID == PracticeID,
     within(ltc_invite_date, ltc_invite_date_plus60, ltc_attend_date, ltc_attend_date)
   )
 ) |>
-  select(PatientID, census_date, ltc_invite_date, ltc_attend_date)
+  select(PatientID, PracticeID, census_date, ltc_invite_date, ltc_attend_date)
 
 ltc_attend_census <- left_join(
   ltc_attend,
@@ -73,7 +77,7 @@ ltc_attend_census <- left_join(
   by = join_by(within(ltc_attend_date, ltc_attend_date, census_date_minus15, census_date))
 ) |>
   # We only need one record per census date per patient
-  select(PatientID, census_date, ltc_attend_date) |>
+  select(PatientID, PracticeID, census_date, ltc_attend_date) |>
   distinct(.keep_all = TRUE)
 
 first_diag_census <- left_join(
@@ -101,6 +105,7 @@ monthly_summary <- census_data |>
   group_by(census_date) |>
   summarise(
     count = n_distinct(PatientID),
+    #Practice_count = 
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
     .groups = "drop"
