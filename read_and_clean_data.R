@@ -41,7 +41,7 @@ cleaned_filtered <- raw_data |>
 
 
 # Adding a column where EventType = Main Address Off Shetland with a date
-cleaned_filtered %>% 
+cleaned_filtered <- cleaned_filtered %>% 
   mutate(LeftShetlandDate = if_else(EventType == "Main Address Off Shetland",EventDate,NA)) %>% 
   group_by(PatientID)%>%
   mutate(LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
@@ -51,9 +51,8 @@ cleaned_filtered %>%
   group_by(PatientID, PracticeID)%>%
   mutate(LeftDate = max(LeftDate, na.rm = TRUE),
          LeftDate=na_if(LeftDate,as.Date(-Inf))) %>% #clean up when there is no date for LeftDate
-  ungroup() %>%
-  View()
-
+  ungroup()
+ 
 
 write_parquet(
   cleaned_filtered,
