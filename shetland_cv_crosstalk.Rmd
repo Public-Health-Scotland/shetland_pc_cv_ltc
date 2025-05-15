@@ -1,0 +1,258 @@
+---
+title: "Shetland PCPIP Indicators"
+author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
+date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  html_document:
+    css: phs_style.css
+    toc: true
+    toc_float: true
+---
+
+# Shetland PCPIP Indicators
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# Copy in the PHS style CSS file if required
+if (!file.exists(file.path(getwd(), "phs_style.css"))) {
+  phstemplates::add_stylecss(getwd(), auto_open = FALSE, shinycss = FALSE)
+}
+```
+
+```{r load_packages, include=FALSE}
+library(crosstalk)
+library(plotly)
+library(DT)
+library(dplyr)
+library(scales)
+```
+
+```{r get_prev_data, include=FALSE, cache.rebuild = file.info("shetland_cv_crosstalk.html")$mtime < file.info("prevalence.R")$mtime}
+source("prevalence.R")
+```
+
+```{r prep_data}
+monthly_summary <- monthly_summary |>
+  filter(census_date >= as.Date("2021-11-01")) |>
+  mutate(PracticeID = factor(PracticeID))
+```
+
+```{r generic_dt_func} 
+make_dt <- function(shared_data, var, name, percentage = FALSE) {
+  # Only show relevant columns
+  columns_to_show <- c("census_date", "PracticeID", var)
+  indices_to_hide <- which(!(names(shared_data$data()) %in% columns_to_show))
+
+  # Create the DT datatable
+  cv_prev_dt <- datatable(
+    shared_data,
+    # Nicer column names
+    colnames = c(
+      "Practice ID" = "PracticeID",
+      "Month" = "census_date",
+     setNames(var, name)
+    ),
+    rownames = FALSE,
+    filter = "none",
+    options = list(
+      columnDefs = list(
+        # Hide the columns (0-indexed)
+        list(visible = FALSE, targets = indices_to_hide - 1)
+      ),
+      searching = FALSE
+    )
+  )
+
+  if (percentage) {
+    cv_prev_dt <- formatPercentage(cv_prev_dt, name, digits = 1)
+  }
+
+  return(cv_prev_dt)
+}
+```
+
+
+```{r make_plotly_palette}
+practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
+n_practices <- length(practice_ids)
+
+practice_colours <- setNames(phsstyles::phs_colors()[seq_along(practice_ids)], practice_ids)
+
+symbols_to_use <- c("circle", "cross", "star")
+practice_symbols <- setNames(rep(symbols_to_use, length.out = n_practices), practice_ids)
+```
+
+```{r crosstalk_setup}
+# Wrap the data frame in SharedData
+# Use PracticeID as the key for linking
+shared_monthly_summary <- SharedData$new(monthly_summary, key = ~PracticeID, group = "practice_selection")
+```
+
+## GP Practice section
+
+Select one or more GP Practices here; by default, all practices are shown.
+
+```{r interactive_filter}
+# Function to dynamically determine the number of columns
+best_n_cols <- function(x) {
+  factors <- which(x %% 1L:(x - 1L) == 0L)
+  closest_factor <- factors[which.min(abs(factors - sqrt(x)))]
+  return(closest_factor)
+}
+
+# Create the filter control for GP practice
+# Allows selecting one or more practices
+filter_checkbox(
+  id = "practice_filter",
+  label = "Select GP Practice(s):",
+  sharedData = shared_monthly_summary,
+  group = ~PracticeID, # Filter based on the PracticeID column,
+  columns = best_n_cols(n_practices)
+)
+```
+
+## LTC - Cardiovascular disease
+
+### Prevelance
+
+```{r cv_prev_plotly}
+cv_prev_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~count,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Count:", count)
+) |>
+  layout(
+    title = str_wrap("Monthly CV Prevelance count per GP Practice", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(title = "Count"),
+    showlegend = TRUE,
+    legend = list(
+      title = list(text = "Practice ID")
+    )
+  )
+```
+
+```{r cv_prev_dt}
+# Create the DT datatable
+cv_prev_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "count",
+  name = "Prevelance count"
+)
+```
+
+```{r display_cv_prev_elements}
+# Display the plot and table
+# Arrange plot and table side-by-side on large screens, or stacked on smaller.
+bscols(cv_prev_plotly, cv_prev_dt, widths = c(6, 6), device = "lg")
+```
+
+### CTAC 1
+
+This indicator is defined as '*% of patients with CV LTC who have been invited to a first LTC appointment in the past 15 months'*. Specifically:
+
+NUMERATOR: Count of people with CV LTC who have been invited to a first appointment in the past 15 months.
+
+DENOMINATOR: Count of people with CV LTCs.
+
+```{r cv_ctac_1_plotly}
+# It uses the shared data, so it will update based on the filter
+cv_ctac_1_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~ltc_invite_prop,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Monthly CV invite percentage by GP practice", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r cv_ctac_1_dt}
+cv_ctac_1_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "ltc_invite_prop",
+  name = "Invite Percentage",
+  percentage = TRUE
+)
+```
+
+```{r display_cv_ctac_1_elements}
+# Display the plot and table
+# Arrange plot and table side-by-side on large screens, or stacked on smaller.
+bscols(cv_ctac_1_plotly, cv_ctac_1_dt, widths = c(6, 6), device = "lg")
+```
+
+### CTAC 2
+
+This indicator is defined as *'% of patients with CV LTC who have attended a first LTC appointment in the past 15 months'*. Specifically:
+
+NUMERATOR: Count of people with CV LTC who have attended a first appointment in the past 15 months.
+
+DENOMINATOR: Count of people with CV LTCs.
+
+```{r cv_ctac_2_plotly}
+# It uses the shared data, so it will update based on the filter
+cv_ctac_2_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~ltc_attend_prop,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Monthly CV attend percentage by GP practice", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r cv_ctac_2_dt}
+# Only show relevant columns
+columns_to_show <- c("census_date", "PracticeID", "ltc_attend_prop")
+indices_to_hide <- which(!(names(shared_monthly_summary$data()) %in% columns_to_show)) - 1
+
+# Create the DT datatable
+cv_ctac_2_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "ltc_attend_prop",
+  name = "Attend percentage",
+  percentage = TRUE
+)
+```
+
+```{r display_cv_ctac_2_elements}
+# Display the plot and table
+# Arrange plot and table side-by-side on large screens, or stacked on smaller ones.
+bscols(cv_ctac_2_plotly, cv_ctac_2_dt, widths = c(6, 6), device = "lg")
+```
