@@ -169,3 +169,123 @@ a:hover {
     cursor: default;
     border-bottom-color: transparent;
 }
+
+.display {
+  font-family: Arial, sans-serif; /* Sets the font for the entire table */
+  font-size: 16px; /* Sets the font size for the entire table */
+  color: var(--black); /* Sets the text colour for the entire table */
+  background-color: var(--white); /* Sets the background colour for the entire table */
+  border-collapse: collapse; /* Collapses the borders between table cells */
+  width: 100%; /* Makes the table 100% wide */
+  margin-top: 20px; /* Adds space above the table */
+}
+
+.display thead th {
+  background-color: var(--phs-purple); /* Sets the background colour for the table header */
+  color: var(--white); /* Sets the text colour for the table header */
+  padding: 12px; /* Adds padding inside the header cells */
+  text-align: left; /* Aligns the header text to the left */
+  border-bottom: 2px solid var(--phs-purple-80); /* Adds a border below the header */
+}
+
+.display tbody tr:nth-child(odd) {
+  background-color: var(--phs-purple-10); /* Sets the background colour for odd rows */
+}
+
+.display tbody tr:nth-child(even) {
+  background-color: var(--white); /* Sets the background colour for even rows */
+}
+
+.display tbody td {
+  padding: 12px; /* Adds padding inside the table data cells */
+  border-bottom: 1px solid var(--phs-purple-30); /* Adds a border below each data row */
+}
+
+.display tbody tr:hover {
+  background-color: var(--phs-purple-30); /* Changes background colour on hover */
+}
+
+.display tfoot th {
+  background-color: var(--phs-purple); /* Sets the background colour for the table footer */
+  color: var(--white); /* Sets the text colour for the table footer */
+  padding: 12px; /* Adds padding inside the footer cells */
+  text-align: left; /* Aligns the footer text to the left */
+  border-top: 2px solid var(--phs-purple-80); /* Adds a border above the footer */
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid var(--phs-purple-50);  /* Border for the search input */
+    border-radius: 5px;          /* Rounded corners for the search input */
+    padding: 5px;              /* Padding inside the search input */
+    background-color: var(--white);  /* Background color for the search input */
+    color: var(--black);      /* Text color for the search input */
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    outline: none;            /* Removes the default focus outline */
+    border-color: var(--phs-blue);    /* Changes border color on focus */
+    box-shadow: 0 0 5px var(--phs-blue-30);  /* Adds a shadow on focus */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;           /* Padding for pagination buttons */
+    margin: 0 3px;             /* Margin for pagination buttons */
+    border: 1px solid var(--phs-purple-50);  /* Border for pagination buttons */
+    border-radius: 5px;          /* Rounded corners for pagination buttons */
+    background-color: var(--white);  /* Background color for pagination buttons */
+    color: var(--black);      /* Text color for pagination buttons */
+    cursor: pointer;          /* Cursor style for pagination buttons */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: var(--phs-purple-10);  /* Background color on hover */
+    color: var(--black);          /* Text color on hover */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: var(--phs-purple-30);  /* Background color for the current page */
+    color: var(--black);          /* Text color for the current page */
+    border-color: var(--phs-purple);  /* Border color for the current page */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: var(--phs-graphite-50);    /* Text color for disabled buttons */
+    background-color: var(--phs-graphite-10);  /* Background color for disabled buttons */
+    border-color: var(--phs-graphite-50);  /* Border color for disabled buttons */
+    cursor: not-allowed;        /* Cursor style for disabled buttons */
+}
+
+.dataTables_wrapper .dataTables_length select {
+  border: 1px solid var(--phs-purple-50);
+  border-radius: 5px;
+  padding: 5px;
+  background-color: var(--white);
+  color: var(--black);
+}
+
+.dataTables_wrapper .dataTables_length select:focus {
+  outline: none;
+  border-color: var(--phs-blue);
+  box-shadow: 0 0 5px var(--phs-blue-30);
+}
+
+.dataTables_info {
+  color: var(--black);
+}
+
+.dataTables_wrapper .dataTables_processing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 50px;
+  margin-left: -100px;
+  margin-top: -25px;
+  padding: 10px 0;
+  border: 1px solid var(--phs-purple-50);
+  border-radius: 5px;
+  background-color: var(--white);
+  color: var(--black);
+  text-align: center;
+  z-index: 10;
+}
