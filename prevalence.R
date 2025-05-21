@@ -1,24 +1,20 @@
-library(dplyr) 
-library(stringr) 
-library(lubridate) 
-library(nanoparquet) 
-library(fs) 
+library(dplyr)
+library(stringr)
+library(lubridate)
+library(nanoparquet)
+library(fs)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parquet"))
 
-#clean_data <- filter(clean_data, PracticeID != 3)
-
-
-
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
   filter(str_starts(EventType, "Record of Diagnosis")) |>
-  group_by(PatientID, PracticeID) |>   #do we need the PracticeID as we dont have Practice details
+  group_by(PatientID, PracticeID) |> # do we need the PracticeID as we don't have Practice details
   summarise(
     FirstDiag = min(EventDate),
-    DateOfDeath = first(DateOfDeath),    # do we need to add the Left Practice and Main Address Off Shetland?
+    DateOfDeath = first(DateOfDeath), # do we need to add the Left Practice and Main Address Off Shetland?
     LeftDate = first(LeftDate),
     LeftShetlandDate = first(LeftShetlandDate),
   )
@@ -45,7 +41,7 @@ shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_
 months <- tibble(
   census_date = seq.Date(
     from = as.Date("2000-01-01"),
-    to = as.Date("2025-04-22"), #latest date available
+    to = as.Date("2025-04-22"), # latest date available
     by = "month"
   )
 )
@@ -89,7 +85,7 @@ first_diag_census <- left_join(
   by = join_by(FirstDiag <= census_date)
 ) |>
   # Exclude records after death
-  filter(is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month"))|> 
+  filter(is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")) |>
   filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
   filter(is.na(LeftShetlandDate) | census_date <= floor_date(LeftShetlandDate, unit = "month"))
 
@@ -111,18 +107,19 @@ monthly_summary <- census_data |>
     count = n_distinct(PatientID),
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    .groups = "drop"
+    ltc_invite_prop = ltc_invite_count / count,
+    ltc_attend_prop = ltc_attend_count / count
   ) |>
-  ungroup() |> 
-  mutate(census_year = year(census_date)) |>
-  left_join(shetland_pops, by = join_by(closest(census_year >= pop_year))) |>
-  left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date)))
-  
-  ###Can be used once we can identify Practices#
-  #left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date))) |>
-  #mutate(
-    #pop_prev = count / pop,
-    #list_prev = count / list_pop,
-   # ltc_invite_prop = ltc_invite_count / count,
-    #ltc_attend_prop = ltc_attend_count / count
-  #)
+  ungroup() |>
+  mutate(census_year = year(census_date))
+
+
+# Can be used once we can identify Practices
+# left_join(shetland_pops, by = join_by(closest(census_year >= pop_year))) |>
+# left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date)))
+# mutate(
+# pop_prev = count / pop,
+# list_prev = count / list_pop,
+# ltc_invite_prop = ltc_invite_count / count,
+# ltc_attend_prop = ltc_attend_count / count
+# )
