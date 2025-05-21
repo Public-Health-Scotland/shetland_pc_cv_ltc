@@ -26,10 +26,15 @@ library(plotly)
 library(DT)
 library(dplyr)
 library(scales)
+library(phsstyles)
 ```
 
-```{r get_prev_data, include=FALSE, cache.rebuild = file.info("shetland_cv_crosstalk.html")$mtime < file.info("prevalence.R")$mtime}
+```{r get_prev_data, include=FALSE}
 source("prevalence.R")
+```
+
+```{r source_functions} 
+source("functions/make_dt.R")
 ```
 
 ```{r prep_data}
@@ -38,38 +43,14 @@ monthly_summary <- monthly_summary |>
   mutate(PracticeID = factor(PracticeID))
 ```
 
-```{r generic_dt_func} 
-make_dt <- function(shared_data, var, name, percentage = FALSE) {
-  # Only show relevant columns
-  columns_to_show <- c("census_date", "PracticeID", var)
-  indices_to_hide <- which(!(names(shared_data$data()) %in% columns_to_show))
-
-  # Create the DT datatable
-  cv_prev_dt <- datatable(
-    shared_data,
-    # Nicer column names
-    colnames = c(
-      "Practice ID" = "PracticeID",
-      "Month" = "census_date",
-     setNames(var, name)
-    ),
-    rownames = FALSE,
-    filter = "none",
-    options = list(
-      columnDefs = list(
-        # Hide the columns (0-indexed)
-        list(visible = FALSE, targets = indices_to_hide - 1)
-      ),
-      searching = FALSE
-    )
-  )
-
-  if (percentage) {
-    cv_prev_dt <- formatPercentage(cv_prev_dt, name, digits = 1)
-  }
-
-  return(cv_prev_dt)
-}
+```{r crosstalk_setup}
+# Wrap the data frame in SharedData
+# Use PracticeID as the key for linking
+shared_monthly_summary <- SharedData$new(
+  data = monthly_summary,
+  key = ~PracticeID,
+  group = "practice_selection"
+)
 ```
 
 
@@ -77,16 +58,16 @@ make_dt <- function(shared_data, var, name, percentage = FALSE) {
 practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
 n_practices <- length(practice_ids)
 
-practice_colours <- setNames(phsstyles::phs_colors()[seq_along(practice_ids)], practice_ids)
+practice_colours <- setNames(
+  object = phs_colors()[seq_along(practice_ids)],
+  nm = practice_ids
+)
 
 symbols_to_use <- c("circle", "cross", "star")
-practice_symbols <- setNames(rep(symbols_to_use, length.out = n_practices), practice_ids)
-```
-
-```{r crosstalk_setup}
-# Wrap the data frame in SharedData
-# Use PracticeID as the key for linking
-shared_monthly_summary <- SharedData$new(monthly_summary, key = ~PracticeID, group = "practice_selection")
+practice_symbols <- setNames(
+  object = rep(symbols_to_use, length.out = n_practices),
+  nm = practice_ids
+)
 ```
 
 ## GP Practice section
@@ -142,11 +123,11 @@ cv_prev_plotly <- plot_ly(
 ```
 
 ```{r cv_prev_dt}
-# Create the DT datatable
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
   var = "count",
-  name = "Prevelance count"
+  name = "Prevelance count",
+  percentage = FALSE
 )
 ```
 
@@ -238,10 +219,6 @@ cv_ctac_2_plotly <- plot_ly(
 ```
 
 ```{r cv_ctac_2_dt}
-# Only show relevant columns
-columns_to_show <- c("census_date", "PracticeID", "ltc_attend_prop")
-indices_to_hide <- which(!(names(shared_monthly_summary$data()) %in% columns_to_show)) - 1
-
 # Create the DT datatable
 cv_ctac_2_dt <- make_dt(
   shared_data = shared_monthly_summary,
