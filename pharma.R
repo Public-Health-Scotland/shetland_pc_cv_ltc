@@ -7,17 +7,20 @@ library(readxl)
 library(openxlsx)
 
 # Load file
-
-med_reviews <- read.xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-04-23 - LIST - Med Reviews.xlsx") |> 
-  filter(!is.na(PracticeID)) |> 
-  select(PracticeID, ReviewDate, EventCode, EventDescription, DerivedEventType, DerivedStaffType) |> 
+# Gives warning for 1860-01-01 in PreviousReviewDate
+med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-04-23 - LIST - Med Reviews.xlsx") |>
+  filter(!is.na(PracticeID)) |>
+  select(PracticeID,
+    EventDate = ReviewDate,
+    EventCode,
+    EventDescription,
+    DerivedEventType,
+    DerivedStaffType
+  ) |>
   mutate(
-    EventDate = as.Date(ReviewDate, origin = "1899-12-30"),
     MonthYear = format(EventDate, "%Y-%m"),
     QuarterYear = paste0("Q", quarter(EventDate), "-", year(EventDate))
   )
-
-
 # Summarize events by staff type and month
 event_summary <- med_reviews %>%
   count(PracticeID, DerivedStaffType, MonthYear, name = "NumberOfEvents") %>%
