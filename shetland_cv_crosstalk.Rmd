@@ -33,26 +33,30 @@ library(phsstyles)
 source("prevalence.R")
 ```
 
-```{r source_functions} 
+```{r get_pharma_data, include=FALSE}
+source("pharma.R")
+```
+
+```{r source_functions}
 source("functions/make_dt.R")
 ```
 
-```{r prep_data}
-monthly_summary <- monthly_summary |>
-  filter(census_date >= as.Date("2021-11-01")) |>
-  mutate(PracticeID = factor(PracticeID))
-```
-
 ```{r crosstalk_setup}
+all_data <- monthly_summary |> 
+  left_join(pharmacist_reviews, by = join_by(census_date, PracticeID)) |> 
+  left_join(quarterly_event_type, by = join_by(census_date == quarter_start, PracticeID)) |> 
+  filter(census_date >= as.Date("2021-11-01")) |>
+  mutate(PracticeID = factor(PracticeID)) |> 
+    mutate(show_legend_flag = !duplicated(DerivedEventType))
+
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
 shared_monthly_summary <- SharedData$new(
-  data = monthly_summary,
+  data = all_data,
   key = ~PracticeID,
   group = "practice_selection"
 )
 ```
-
 
 ```{r make_plotly_palette}
 practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
@@ -93,9 +97,9 @@ filter_checkbox(
 )
 ```
 
-## LTC - Cardiovascular disease
+## Long Term Conditions
 
-### Prevelance
+### Cardiovascular disease prevelance
 
 ```{r cv_prev_plotly}
 cv_prev_plotly <- plot_ly(
@@ -137,7 +141,7 @@ cv_prev_dt <- make_dt(
 bscols(cv_prev_plotly, cv_prev_dt, widths = c(6, 6), device = "lg")
 ```
 
-### CTAC 1
+### Cardiovascular disease review invites
 
 This indicator is defined as '*% of patients with CV LTC who have been invited to a first LTC appointment in the past 15 months'*. Specifically:
 
@@ -185,7 +189,7 @@ cv_ctac_1_dt <- make_dt(
 bscols(cv_ctac_1_plotly, cv_ctac_1_dt, widths = c(6, 6), device = "lg")
 ```
 
-### CTAC 2
+### Cardiovascular disease review attendances
 
 This indicator is defined as *'% of patients with CV LTC who have attended a first LTC appointment in the past 15 months'*. Specifically:
 
@@ -232,4 +236,207 @@ cv_ctac_2_dt <- make_dt(
 # Display the plot and table
 # Arrange plot and table side-by-side on large screens, or stacked on smaller ones.
 bscols(cv_ctac_2_plotly, cv_ctac_2_dt, widths = c(6, 6), device = "lg")
+```
+
+## Pharmacotherapy
+
+### Reviews by a pharmacist
+
+This indicator is defined as *'% of medication reviews completed by a Pharmacist'*. Specifically:
+
+NUMERATOR: Count of medication reviews conducted by Pharmacist
+
+DENOMINATOR: Count of medication reviews completed
+
+```{r pharm_6_plotly}
+# It uses the shared data, so it will update based on the filter
+pharm_6_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~pharmacist_proportion,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Monthly percentage of reviews completed by a pharmacist", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r pharm_6_dt}
+# Create the DT datatable
+pharm_6_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "pharmacist_proportion",
+  name = "Percentage by pharmacist",
+  percentage = TRUE
+)
+```
+
+```{r display_pharm_6_elements}
+pharm_6_plotly
+pharm_6_dt
+```
+
+### Types of medication review conducted
+
+Proportional type of medication review conducted - quarterly
+1. Medication Review with Person
+2. Notes based Medication Review
+3. Polypharmacy Medication Review
+
+```{r pharm_9_plotly}
+create_subplot_title_annotations <- function(num_rows, titles_vector, subplot_margin) {
+  num_plots <- length(titles_vector)
+  num_cols <- ceiling(num_plots / num_rows)
+  annotations <- list()
+
+  # Calculate the effective height of each row, including its internal margin
+  # The `subplot_margin` is the fraction of the plot area, so we need to adjust for that.
+  # A simpler way is to divide the total grid height by the number of rows.
+  height_per_row_effective <- 0.85 / num_rows
+
+  # A small offset to place the title just above the subplot area
+  title_y_offset_above_row <- 0.02 # Adjust this value if titles are too close/far from subplots
+
+  for (i in seq_along(titles_vector)) {
+    row_idx <- ceiling(i / num_cols)
+    col_idx <- (i - 1) %% num_cols + 1
+
+    # Calculate x paper coordinate (center of the column)
+    x_coord <- (col_idx - 0.5) / num_cols
+
+    # Calculate y paper coordinate for the title
+    # Start from the top of the grid and step down by the effective height per row
+    # The (row_idx - 1) ensures the first row doesn't step down.
+    # Add the title_y_offset_above_row to place it slightly above the row.
+    y_coord <- 1 - (row_idx - 1) * height_per_row_effective + title_y_offset_above_row
+
+    annotations[[length(annotations) + 1]] <- list(
+      x = x_coord,
+      y = y_coord,
+      text = paste("Practice", titles_vector[i]),
+      showarrow = FALSE,
+      xref = "paper",
+      yref = "paper",
+      xanchor = "center",
+      yanchor = "bottom",
+      font = list(size = 12)
+    )
+  }
+  return(annotations)
+}
+
+subplot_margin_value <- 0.03
+nrows <- 3
+
+subplot_title_annotations <- create_subplot_title_annotations(
+  num_rows = nrows, # Pass the number of rows for your subplot grid
+  titles_vector = unique(pull(shared_monthly_summary$data(), PracticeID)), # Pass the vector of unique practice IDs
+  subplot_margin = subplot_margin_value
+)
+
+pharm_9_plotly <- shared_monthly_summary$data() |>
+  group_by(PracticeID) %>%
+  group_map(
+    \(practice_data, practice_id) {
+      practice_id <- paste("Practice ", practice_id)
+
+      plot_ly(
+        data = practice_data,
+        x = ~census_date,
+        y = ~event_type_proportion,
+        color = ~DerivedEventType,
+        type = "scatter",
+        mode = "lines+markers",
+        hoverinfo = "text",
+        text = ~ paste(
+          "Practice:", PracticeID,
+          "<br>Quarter:", census_date,
+          "<br>Percentage:", round(event_type_proportion * 100, 1), "%"
+        ),
+        legendgroup = ~DerivedEventType,
+        name = ~DerivedEventType,
+        showlegend = ~any(show_legend_flag)
+      ) |>
+        layout(
+          title = list(text = practice_id, font = list(size = 12)),
+          hovermode = 'x',
+          showlegend = FALSE,
+          # Set titles to empty strings to prevent them from showing on individual subplots.
+          # The shared titles will be applied by the main layout.
+          xaxis = list(title = ""),
+          yaxis = list(title = "")
+        )
+    },
+    .keep = TRUE
+  ) |>
+  subplot(
+    nrows = 4,
+    shareX = TRUE,
+    shareY = TRUE,
+    margin = subplot_margin_value
+  ) |>
+  layout(
+    # Overall plot title
+    title = list(text = str_wrap("Quarterly Type of Review by Practice", 25)),
+    showlegend = TRUE,
+    legend = list(
+      title = list(text = "Review Type"),
+      orientation = "h", # Place legend horizontally.
+      x = 0.5, y = 0.1, # Position legend below the plot area.
+      xanchor = "center"
+    ),
+    annotations = c(list(
+      # X-axis label
+      list(
+        x = 0.5, # Centre horizontally
+        y = 0.1, # Position below the plots (adjust as needed)
+        text = "Quarter",
+        showarrow = FALSE,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "center",
+        yanchor = "bottom"
+      ),
+      # Y-axis label
+      list(
+        x = -0.04, # Position to the left of the plots (adjust as needed)
+        y = 0.6, # Centre vertically
+        text = "Review Type Percentage",
+        showarrow = FALSE,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "middle",
+        textangle = -90 # Rotate text for vertical label
+      )),
+      subplot_title_annotations
+    )
+  )
+```
+
+```{r pharm_9_dt}
+# Create the DT datatable
+pharm_9_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "event_type_proportion",
+  name = "Proportion",
+  percentage = TRUE
+)
+```
+
+```{r display_pharm_9_elements}
+pharm_9_plotly
+pharm_9_dt
 ```
