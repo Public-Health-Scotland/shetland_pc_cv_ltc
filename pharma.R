@@ -7,8 +7,7 @@ library(readxl)
 library(openxlsx)
 
 # Load file
-# Gives warning for 1860-01-01 in PreviousReviewDate
-
+# read_xlsx gives a warning for 1860-01-01 in PreviousReviewDate
 med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-04-23 - LIST - Med Reviews.xlsx") |>
   filter(!is.na(PracticeID)) |>
   select(PracticeID,
