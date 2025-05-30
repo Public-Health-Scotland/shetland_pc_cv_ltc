@@ -8,6 +8,7 @@ library(openxlsx)
 
 # Load file
 # Gives warning for 1860-01-01 in PreviousReviewDate
+
 med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-04-23 - LIST - Med Reviews.xlsx") |>
   filter(!is.na(PracticeID)) |>
   select(PracticeID,
@@ -21,29 +22,59 @@ med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/ra
     MonthYear = format(EventDate, "%Y-%m"),
     QuarterYear = paste0("Q", quarter(EventDate), "-", year(EventDate))
   )
-# Summarize events by staff type and month
-event_summary <- med_reviews %>%
-  count(PracticeID, DerivedStaffType, MonthYear, name = "NumberOfEvents") %>%
-  pivot_wider(names_from = MonthYear, values_from = NumberOfEvents, values_fill = 0)
 
-# Calculate pharmacist percentages per practice
-summed_practice_datasets <- event_summary %>%
-  group_split(PracticeID) %>%
-  setNames(unique(event_summary$PracticeID)) %>%
-  lapply(function(df) {
-    df %>%
-      group_by(DerivedStaffType) %>%
-      summarize(across(starts_with("20"), sum, .names = "Total_{col}"), .groups = "drop")
-  })
+# Summarise events by staff type and month, filter for Pharmacist
 
-pharmacist_percentages <- lapply(summed_practice_datasets, function(df) {
-  total <- df %>% summarize(across(starts_with("Total_"), sum))
-  pharmacist <- df %>% filter(DerivedStaffType == "Pharmacist") %>%
-    summarize(across(starts_with("Total_"), sum))
-  round(pharmacist / total * 100, 1)
-})
+pharmacist_reviews <- med_reviews |>
+  mutate(census_date = floor_date(EventDate, unit = "month")) |>
+  count(PracticeID, census_date, DerivedStaffType, name = "NumberOfEvents") |>
+  group_by(PracticeID, census_date) |>
+  mutate(total_events = sum(NumberOfEvents)) |>
+  ungroup() |>
+  filter(DerivedStaffType == "Pharmacist") |>
+  mutate(pharmacist_proportion = NumberOfEvents / total_events)
 
-final_results <- bind_rows(pharmacist_percentages, .id = "PracticeID")
+# Summarise event type by Practice
+
+monthly_event_type <- med_reviews %>%
+  mutate(census_date = floor_date(EventDate, unit = "month")) %>%
+  count(PracticeID, census_date, DerivedEventType, name = "NumberOfEvents") %>%
+  group_by(PracticeID, census_date) %>%
+  mutate(
+    TotalEvents = sum(NumberOfEvents),
+    event_type_proportion = NumberOfEvents / TotalEvents
+  ) %>%
+  ungroup() %>%
+  arrange(PracticeID, census_date, DerivedEventType)
+
+# Summarise event type and add quarter column
+
+quarterly_event_type <- monthly_event_type %>%
+  mutate(quarter_start = floor_date(census_date, "quarter")) %>%
+  group_by(PracticeID, quarter_start, DerivedEventType) %>%
+  summarise(
+    NumberOfEvents = sum(NumberOfEvents),
+    TotalEvents = sum(TotalEvents),
+    .groups = "drop"
+  ) %>%
+  mutate(event_type_proportion = NumberOfEvents / TotalEvents)
+
+# Create a named list of data frames for export
+output_list <- list(
+  "Pharmacist Percentages" = pharmacist_reviews,
+  "Monthly Percentages" = monthly_event_type,
+  "Quarterly Percentages" = quarterly_event_type
+)
+
+# Write the list to the specified Excel file path
+
+write_xlsx(output_list, path = "/conf/LIST_analytics/Shetland/Primary Care/PCPIP Indicators/Peter/pharmareviewsmay28.xlsx")
+
+
+
+
+
+### Prior Code below ... delete
 
 # Monthly summary and percentage pivot
 monthly_summary <- med_reviews %>%
@@ -95,6 +126,11 @@ monthly_percentage_long <- monthly_percentage_pivot %>%
 # Output previews
 print(monthly_percentage_long)
 print(quarterly_percentage_long)
+
+#don't  use this code, it's just to show what the final structure should look like but you  can get there much more cleanly than this.
+quarterly_percentage_long |> 
+  filter(str_sub(QuarterYear, 4) >= 2023) |> 
+  pivot_longer(contains(" "))
 
 # Create a named list of data frames for export
 output_list <- list(
