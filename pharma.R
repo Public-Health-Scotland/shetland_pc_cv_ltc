@@ -4,7 +4,6 @@ library(readr)
 library(writexl)
 library(tidyr)
 library(readxl)
-library(openxlsx)
 
 # Load file
 # read_xlsx gives a warning for 1860-01-01 in PreviousReviewDate
