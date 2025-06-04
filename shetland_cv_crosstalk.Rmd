@@ -11,6 +11,12 @@ output:
 
 # Shetland PCPIP Indicators
 
+These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient level data has been extracted from SHIP, it was then anonymised before being sent securely to PHS.
+
+The indicators are a Work In Progress, there may be issues with the indicator definition or  with the analysis methodology. We will work to improve them, iterating on feedback recieved. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
@@ -42,12 +48,13 @@ source("functions/make_dt.R")
 ```
 
 ```{r crosstalk_setup}
-all_data <- monthly_summary |> 
-  left_join(pharmacist_reviews, by = join_by(census_date, PracticeID)) |> 
-  left_join(quarterly_event_type, by = join_by(census_date == quarter_start, PracticeID)) |> 
+all_data <- monthly_summary |>
+  left_join(pharmacist_reviews, by = join_by(census_date, PracticeID)) |>
+  left_join(quarterly_event_type, by = join_by(census_date == quarter_start, PracticeID)) |>
   filter(census_date >= as.Date("2021-11-01")) |>
-  mutate(PracticeID = factor(PracticeID)) |> 
-    mutate(show_legend_flag = !duplicated(DerivedEventType))
+  mutate(census_date = as.Date(census_date)) |>
+  mutate(PracticeID = factor(PracticeID)) |>
+  mutate(show_legend_flag = !duplicated(DerivedEventType))
 
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
@@ -76,7 +83,9 @@ practice_symbols <- setNames(
 
 ## GP Practice section
 
-Select one or more GP Practices here; by default, all practices are shown.
+Select one or more GP Practices here; by default, all practices are shown, however viewing 9 practices on a single plot will often look quite chaotic!
+
+All plots and data tables will be filtered to the selected practice(s). 
 
 ```{r interactive_filter}
 # Function to dynamically determine the number of columns
@@ -100,6 +109,8 @@ filter_checkbox(
 ## Long Term Conditions
 
 ### Cardiovascular disease prevelance
+
+This looks at the counts of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
 
 ```{r cv_prev_plotly}
 cv_prev_plotly <- plot_ly(
@@ -137,8 +148,8 @@ cv_prev_dt <- make_dt(
 
 ```{r display_cv_prev_elements}
 # Display the plot and table
-# Arrange plot and table side-by-side on large screens, or stacked on smaller.
-bscols(cv_prev_plotly, cv_prev_dt, widths = c(6, 6), device = "lg")
+cv_prev_plotly
+cv_prev_dt
 ```
 
 ### Cardiovascular disease review invites
@@ -185,8 +196,8 @@ cv_ctac_1_dt <- make_dt(
 
 ```{r display_cv_ctac_1_elements}
 # Display the plot and table
-# Arrange plot and table side-by-side on large screens, or stacked on smaller.
-bscols(cv_ctac_1_plotly, cv_ctac_1_dt, widths = c(6, 6), device = "lg")
+cv_ctac_1_plotly
+cv_ctac_1_dt
 ```
 
 ### Cardiovascular disease review attendances
@@ -290,10 +301,13 @@ pharm_6_dt
 
 ### Types of medication review conducted
 
-Proportional type of medication review conducted - quarterly
-1. Medication Review with Person
-2. Notes based Medication Review
-3. Polypharmacy Medication Review
+This indicator looks at the type of medication review conducted, it is presented quarterly as a percentage of all reviews. It is possible to present this indicator monthly but the data tends to be very 'noisy'. The types of review are:
+
+1.  Medication Review with Person
+2.  Notes-based Medication Review
+3.  Polypharmacy Medication Review
+
+Note that this plot will not be affected by the practice filter.
 
 ```{r pharm_9_plotly}
 create_subplot_title_annotations <- function(num_rows, titles_vector, subplot_margin) {
@@ -304,28 +318,28 @@ create_subplot_title_annotations <- function(num_rows, titles_vector, subplot_ma
   # Calculate the effective height of each row, including its internal margin
   # The `subplot_margin` is the fraction of the plot area, so we need to adjust for that.
   # A simpler way is to divide the total grid height by the number of rows.
-  height_per_row_effective <- 0.85 / num_rows
+  height_per_row_effective <- 0.8 / num_rows
 
   # A small offset to place the title just above the subplot area
-  title_y_offset_above_row <- 0.02 # Adjust this value if titles are too close/far from subplots
+  title_y_offset_above_row <- 0 # Adjust this value if titles are too close/far from subplots
 
   for (i in seq_along(titles_vector)) {
     row_idx <- ceiling(i / num_cols)
     col_idx <- (i - 1) %% num_cols + 1
 
-    # Calculate x paper coordinate (center of the column)
+    # Calculate x paper coordinate (centre of the column)
     x_coord <- (col_idx - 0.5) / num_cols
 
     # Calculate y paper coordinate for the title
     # Start from the top of the grid and step down by the effective height per row
     # The (row_idx - 1) ensures the first row doesn't step down.
     # Add the title_y_offset_above_row to place it slightly above the row.
-    y_coord <- 1 - (row_idx - 1) * height_per_row_effective + title_y_offset_above_row
+    y_coord <- 1 - row_idx * height_per_row_effective + title_y_offset_above_row
 
     annotations[[length(annotations) + 1]] <- list(
       x = x_coord,
       y = y_coord,
-      text = paste("Practice", titles_vector[i]),
+      text = paste("<b>Practice", titles_vector[i], "</b>"),
       showarrow = FALSE,
       xref = "paper",
       yref = "paper",
@@ -346,6 +360,9 @@ subplot_title_annotations <- create_subplot_title_annotations(
   subplot_margin = subplot_margin_value
 )
 
+event_type_colours <- phs_colours(c("phs-purple", "phs-magenta", "phs-blue")) |> 
+  setNames(unique(pull(quarterly_event_type, DerivedEventType)))
+
 pharm_9_plotly <- shared_monthly_summary$data() |>
   group_by(PracticeID) %>%
   group_map(
@@ -357,21 +374,24 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         x = ~census_date,
         y = ~event_type_proportion,
         color = ~DerivedEventType,
+        colours = event_type_colours,
+        symbol = ~PracticeID,
+        symbols = practice_symbols,
         type = "scatter",
         mode = "lines+markers",
         hoverinfo = "text",
         text = ~ paste(
-          "Practice:", PracticeID,
-          "<br>Quarter:", census_date,
+          "Quarter start:", census_date,
+          "<br>Event type:", DerivedEventType,
           "<br>Percentage:", round(event_type_proportion * 100, 1), "%"
         ),
         legendgroup = ~DerivedEventType,
         name = ~DerivedEventType,
-        showlegend = ~any(show_legend_flag)
+        showlegend = ~ any(show_legend_flag)
       ) |>
         layout(
           title = list(text = practice_id, font = list(size = 12)),
-          hovermode = 'x',
+          hovermode = "x",
           showlegend = FALSE,
           # Set titles to empty strings to prevent them from showing on individual subplots.
           # The shared titles will be applied by the main layout.
@@ -389,7 +409,7 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
   ) |>
   layout(
     # Overall plot title
-    title = list(text = str_wrap("Quarterly Type of Review by Practice", 25)),
+    title = list(text = str_wrap("<b>Quarterly Type of Review by Practice</b>", 25)),
     showlegend = TRUE,
     legend = list(
       title = list(text = "Review Type"),
@@ -397,41 +417,46 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
       x = 0.5, y = 0.1, # Position legend below the plot area.
       xanchor = "center"
     ),
-    annotations = c(list(
-      # X-axis label
+    annotations = c(
       list(
-        x = 0.5, # Centre horizontally
-        y = 0.1, # Position below the plots (adjust as needed)
-        text = "Quarter",
-        showarrow = FALSE,
-        xref = "paper",
-        yref = "paper",
-        xanchor = "center",
-        yanchor = "bottom"
+        # X-axis label
+        list(
+          x = 0.5, # Centre horizontally
+          y = 0.1, # Position below the plots (adjust as needed)
+          text = "<b>Quarter</b>",
+          showarrow = FALSE,
+          xref = "paper",
+          yref = "paper",
+          xanchor = "center",
+          yanchor = "bottom"
+        ),
+        # Y-axis label
+        list(
+          x = -0.04, # Position to the left of the plots (adjust as needed)
+          y = 0.6, # Centre vertically
+          text = "<b>Review Type Percentage</b>",
+          showarrow = FALSE,
+          xref = "paper",
+          yref = "paper",
+          xanchor = "right",
+          yanchor = "middle",
+          textangle = -90 # Rotate text for vertical label
+        )
       ),
-      # Y-axis label
-      list(
-        x = -0.04, # Position to the left of the plots (adjust as needed)
-        y = 0.6, # Centre vertically
-        text = "Review Type Percentage",
-        showarrow = FALSE,
-        xref = "paper",
-        yref = "paper",
-        xanchor = "right",
-        yanchor = "middle",
-        textangle = -90 # Rotate text for vertical label
-      )),
       subplot_title_annotations
     )
   )
 ```
+
+Note that in this iteration, the below data table includes blank rows for months that are not the start of the quarter.
 
 ```{r pharm_9_dt}
 # Create the DT datatable
 pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
   var = "event_type_proportion",
-  name = "Proportion",
+  name = "Review Type Percentage",
+  keep_cols = "DerivedEventType", 
   percentage = TRUE
 )
 ```
