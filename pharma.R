@@ -53,8 +53,8 @@ quarterly_event_type <- monthly_event_type %>%
   summarise(
     NumberOfEvents = sum(NumberOfEvents),
     TotalEvents = sum(TotalEvents),
-    .groups = "drop"
   ) %>%
+  ungroup() %>%
   mutate(event_type_proportion = NumberOfEvents / TotalEvents)
 
 # Create a named list of data frames for export
