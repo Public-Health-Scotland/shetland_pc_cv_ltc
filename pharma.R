@@ -7,10 +7,10 @@ library(readxl)
 
 # Load file
 # read_xlsx gives a warning for 1860-01-01 in PreviousReviewDate
-med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-04-23 - LIST - Med Reviews.xlsx") |>
+med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-05 - LIST - Med Reviews.xlsx") |>
   filter(!is.na(PracticeID)) |>
   select(PracticeID,
-    EventDate = ReviewDate,
+    EventDate,
     EventCode,
     EventDescription,
     DerivedEventType,
@@ -66,7 +66,7 @@ output_list <- list(
 
 # Write the list to the specified Excel file path
 
-write_xlsx(output_list, path = "/conf/LIST_analytics/Shetland/Primary Care/PCPIP Indicators/Peter/pharmareviewsmay28.xlsx")
+write_xlsx(output_list, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/pharmareviews_may25.xlsx")
 
 
 
