@@ -2,8 +2,6 @@ library(dplyr)
 library(lubridate)
 library(nanoparquet)
 library(writexl)
-library(tidyr)
-library(readxl)
 
 # Read in pre-cleaned data
 
