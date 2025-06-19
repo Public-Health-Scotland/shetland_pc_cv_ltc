@@ -1,25 +1,13 @@
 library(dplyr)
 library(lubridate)
-library(readr)
+library(nanoparquet)
 library(writexl)
 library(tidyr)
 library(readxl)
 
-# Load file
-# read_xlsx gives a warning for 1860-01-01 in PreviousReviewDate
-med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-05 - LIST - Med Reviews.xlsx") |>
-  filter(!is.na(PracticeID)) |>
-  select(PracticeID,
-    EventDate,
-    EventCode,
-    EventDescription,
-    DerivedEventType,
-    DerivedStaffType
-  ) |>
-  mutate(
-    MonthYear = format(EventDate, "%Y-%m"),
-    QuarterYear = paste0("Q", quarter(EventDate), "-", year(EventDate))
-  )
+# Read in pre-cleaned data
+
+med_reviews <- read_parquet("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/working/med_reviews_clean.parquet")
 
 # Summarise events by staff type and month, filter for Pharmacist
 
@@ -64,9 +52,14 @@ output_list <- list(
   "Quarterly Percentages" = quarterly_event_type
 )
 
-# Write the list to the specified Excel file path
+# Generate the file path with the current date in YYYYMMDD format
 
-write_xlsx(output_list, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/pharmareviews_may25.xlsx")
+date_str <- format(Sys.Date(), "%Y%m%d")
+file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Shetland-PCPIP-indicators-", date_str, ".xlsx")
+
+# Write the output
+
+write_xlsx(output_list, path = file_path)
 
 
 
