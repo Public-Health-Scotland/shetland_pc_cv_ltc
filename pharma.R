@@ -72,3 +72,5 @@ file_path <- paste0(
 # Write the output
 
 write_xlsx(output_list, path = file_path)
+
+rm(med_reviews, output_list, date_str, file_path)

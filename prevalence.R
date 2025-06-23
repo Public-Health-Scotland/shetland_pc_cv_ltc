@@ -167,3 +167,19 @@ monthly_summary <- census_data |>
 # ltc_invite_prop = ltc_invite_count / count,
 # ltc_attend_prop = ltc_attend_count / count
 # )
+
+rm(
+  "census_data",
+  "clean_data",
+  "dir",
+  "first_diag",
+  "first_diag_census",
+  "ltc_attend",
+  "ltc_attend_census",
+  "ltc_invite",
+  "ltc_invite_attend_census",
+  "ltc_invite_census",
+  "months",
+  "shetland_list_sizes",
+  "shetland_pops"
+)
