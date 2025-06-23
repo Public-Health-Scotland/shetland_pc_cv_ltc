@@ -23,6 +23,14 @@ pharmacist_reviews <- med_reviews |>
 # Summarise event type by Practice
 
 monthly_event_type <- med_reviews %>%
+  filter(
+    DerivedEventType %in%
+      c(
+        "Medication Review with Person",
+        "Notes based Medication Review",
+        "Polypharmacy Medication Review"
+      )
+  ) |>
   mutate(census_date = floor_date(EventDate, unit = "month")) %>%
   count(PracticeID, census_date, DerivedEventType, name = "NumberOfEvents") %>%
   group_by(PracticeID, census_date) %>%
