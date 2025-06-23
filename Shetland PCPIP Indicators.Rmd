@@ -28,10 +28,10 @@ if (!file.exists(file.path(getwd(), "phs_style.css"))) {
 
 ```{r load_packages, include=FALSE}
 library(crosstalk)
-library(plotly)
-library(DT)
 library(dplyr)
 library(scales)
+library(plotly)
+library(DT)
 library(phsstyles)
 ```
 
@@ -50,12 +50,20 @@ source("functions/create_subplot_title_annotations.R")
 
 ```{r crosstalk_setup}
 all_data <- monthly_summary |>
-  left_join(pharmacist_reviews, by = join_by(census_date, PracticeID)) |>
-  left_join(quarterly_event_type, by = join_by(census_date == quarter_start, PracticeID)) |>
+  left_join(
+    pharmacist_reviews,
+    by = join_by(census_date, PracticeID)
+  ) |>
+  left_join(
+    quarterly_event_type,
+    by = join_by(census_date == quarter_start, PracticeID)
+  ) |>
   filter(census_date >= as.Date("2021-11-01")) |>
-  mutate(census_date = as.Date(census_date)) |>
-  mutate(PracticeID = factor(PracticeID)) |>
-  mutate(show_legend_flag = !duplicated(DerivedEventType))
+  mutate(
+    census_date = as.Date(census_date),
+    PracticeID = factor(PracticeID),
+    show_legend_flag = !duplicated(DerivedEventType)
+  )
 
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
@@ -320,7 +328,7 @@ subplot_title_annotations <- create_subplot_title_annotations(
   subplot_margin = subplot_margin_value
 )
 
-event_type_colours <- phs_colours(c("phs-purple", "phs-magenta", "phs-blue")) |> 
+event_type_colours <- phs_colours(c("phs-purple", "phs-magenta", "phs-blue")) |>
   setNames(unique(pull(quarterly_event_type, DerivedEventType)))
 
 pharm_9_plotly <- shared_monthly_summary$data() |>
@@ -416,7 +424,7 @@ pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
   var = "event_type_proportion",
   name = "Review Type Percentage",
-  keep_cols = "DerivedEventType", 
+  keep_cols = "DerivedEventType",
   percentage = TRUE
 )
 ```
