@@ -30,7 +30,6 @@ raw_data <- read_csv(
 )
 
 
-
 cleaned_filtered <- raw_data |>
   # 1899 dates are in a different format so will now be NA
   drop_na(EventDate) |>
@@ -41,18 +40,28 @@ cleaned_filtered <- raw_data |>
 
 
 # Adding a column where EventType = Main Address Off Shetland with a date
-cleaned_filtered <- cleaned_filtered %>% 
-  mutate(LeftShetlandDate = if_else(EventType == "Main Address Off Shetland",EventDate,NA)) %>% 
-  group_by(PatientID)%>%
-  mutate(LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
-        LeftShetlandDate=na_if(LeftShetlandDate,as.Date(-Inf))) %>% #clean up when there is no date for LeftShetlandDate
-  ungroup() %>% 
-  mutate(LeftDate = if_else(EventType == "Left Practice",EventDate,NA)) %>% 
-  group_by(PatientID, PracticeID)%>%
-  mutate(LeftDate = max(LeftDate, na.rm = TRUE),
-         LeftDate=na_if(LeftDate,as.Date(-Inf))) %>% #clean up when there is no date for LeftDate
+cleaned_filtered <- cleaned_filtered %>%
+  mutate(
+    LeftShetlandDate = if_else(
+      EventType == "Main Address Off Shetland",
+      EventDate,
+      NA
+    )
+  ) %>%
+  group_by(PatientID) %>%
+  mutate(
+    LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
+    LeftShetlandDate = na_if(LeftShetlandDate, as.Date(-Inf))
+  ) %>% #clean up when there is no date for LeftShetlandDate
+  ungroup() %>%
+  mutate(LeftDate = if_else(EventType == "Left Practice", EventDate, NA)) %>%
+  group_by(PatientID, PracticeID) %>%
+  mutate(
+    LeftDate = max(LeftDate, na.rm = TRUE),
+    LeftDate = na_if(LeftDate, as.Date(-Inf))
+  ) %>% #clean up when there is no date for LeftDate
   ungroup()
- 
+
 
 write_parquet(
   cleaned_filtered,

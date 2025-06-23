@@ -6,7 +6,12 @@ library(fs)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
-clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parquet"))
+clean_data <- read_parquet(path(
+  dir,
+  "data",
+  "working",
+  "apr_25_clean_data.parquet"
+))
 
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
@@ -32,10 +37,20 @@ ltc_attend <- clean_data |>
   rename(ltc_attend_date = EventDate)
 
 # Read in population estimates for Shetland
-shetland_pops <- read_parquet(path(dir, "data", "lookups", "shetland_pops.parquet"))
+shetland_pops <- read_parquet(path(
+  dir,
+  "data",
+  "lookups",
+  "shetland_pops.parquet"
+))
 
 # Read in GP List sizes (aggregated to Shetland cluster level)
-shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_sizes.parquet"))
+shetland_list_sizes <- read_parquet(path(
+  dir,
+  "data",
+  "lookups",
+  "shetland_list_sizes.parquet"
+))
 
 # Create a tibble of monthly dates
 months <- tibble(
@@ -50,7 +65,12 @@ ltc_invite_census <- left_join(
   ltc_invite,
   months |>
     mutate(census_date_minus15 = census_date - months(15)),
-  by = join_by(within(ltc_invite_date, ltc_invite_date, census_date_minus15, census_date))
+  by = join_by(within(
+    ltc_invite_date,
+    ltc_invite_date,
+    census_date_minus15,
+    census_date
+  ))
 ) |>
   # We only need one record per census date per patient?
   select(PatientID, PracticeID, census_date, ltc_invite_date) |>
@@ -63,7 +83,12 @@ ltc_invite_attend_census <- left_join(
   by = join_by(
     PatientID == PatientID,
     PracticeID == PracticeID,
-    within(ltc_invite_date, ltc_invite_date_plus60, ltc_attend_date, ltc_attend_date)
+    within(
+      ltc_invite_date,
+      ltc_invite_date_plus60,
+      ltc_attend_date,
+      ltc_attend_date
+    )
   )
 ) |>
   select(PatientID, PracticeID, census_date, ltc_invite_date, ltc_attend_date)
@@ -72,7 +97,12 @@ ltc_attend_census <- left_join(
   ltc_attend,
   months |>
     mutate(census_date_minus15 = census_date - months(15)),
-  by = join_by(within(ltc_attend_date, ltc_attend_date, census_date_minus15, census_date))
+  by = join_by(within(
+    ltc_attend_date,
+    ltc_attend_date,
+    census_date_minus15,
+    census_date
+  ))
 ) |>
   # We only need one record per census date per patient
   select(PatientID, PracticeID, census_date, ltc_attend_date) |>
@@ -85,19 +115,34 @@ first_diag_census <- left_join(
   by = join_by(FirstDiag <= census_date)
 ) |>
   # Exclude records after death
-  filter(is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")) |>
-  filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
-  filter(is.na(LeftShetlandDate) | census_date <= floor_date(LeftShetlandDate, unit = "month"))
+  filter(
+    is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")
+  ) |>
+  filter(
+    is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")
+  ) |>
+  filter(
+    is.na(LeftShetlandDate) |
+      census_date <= floor_date(LeftShetlandDate, unit = "month")
+  )
 
 census_data <- first_diag_census |>
   left_join(
     ltc_invite_census,
-    by = join_by(PatientID == PatientID, PracticeID == PracticeID, census_date == census_date),
+    by = join_by(
+      PatientID == PatientID,
+      PracticeID == PracticeID,
+      census_date == census_date
+    ),
     multiple = "first"
   ) |>
   left_join(
     ltc_attend_census,
-    by = join_by(PatientID == PatientID, PracticeID == PracticeID, census_date == census_date),
+    by = join_by(
+      PatientID == PatientID,
+      PracticeID == PracticeID,
+      census_date == census_date
+    ),
     multiple = "first"
   )
 
@@ -113,7 +158,6 @@ monthly_summary <- census_data |>
   ungroup() |>
   mutate(census_year = year(census_date))
 
-
 # Can be used once we can identify Practices
 # left_join(shetland_pops, by = join_by(closest(census_year >= pop_year))) |>
 # left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date)))
@@ -123,3 +167,19 @@ monthly_summary <- census_data |>
 # ltc_invite_prop = ltc_invite_count / count,
 # ltc_attend_prop = ltc_attend_count / count
 # )
+
+rm(
+  "census_data",
+  "clean_data",
+  "dir",
+  "first_diag",
+  "first_diag_census",
+  "ltc_attend",
+  "ltc_attend_census",
+  "ltc_invite",
+  "ltc_invite_attend_census",
+  "ltc_invite_census",
+  "months",
+  "shetland_list_sizes",
+  "shetland_pops"
+)

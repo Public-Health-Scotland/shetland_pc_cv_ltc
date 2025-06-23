@@ -5,7 +5,9 @@ library(writexl)
 
 # Read in pre-cleaned data
 
-med_reviews <- read_parquet("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/working/med_reviews_clean.parquet")
+med_reviews <- read_parquet(
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/working/med_reviews_clean.parquet"
+)
 
 # Summarise events by staff type and month, filter for Pharmacist
 
@@ -21,6 +23,14 @@ pharmacist_reviews <- med_reviews |>
 # Summarise event type by Practice
 
 monthly_event_type <- med_reviews %>%
+  filter(
+    DerivedEventType %in%
+      c(
+        "Medication Review with Person",
+        "Notes based Medication Review",
+        "Polypharmacy Medication Review"
+      )
+  ) |>
   mutate(census_date = floor_date(EventDate, unit = "month")) %>%
   count(PracticeID, census_date, DerivedEventType, name = "NumberOfEvents") %>%
   group_by(PracticeID, census_date) %>%
@@ -53,12 +63,14 @@ output_list <- list(
 # Generate the file path with the current date in YYYYMMDD format
 
 date_str <- format(Sys.Date(), "%Y%m%d")
-file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Shetland-PCPIP-indicators-", date_str, ".xlsx")
+file_path <- paste0(
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Shetland-PCPIP-indicators-",
+  date_str,
+  ".xlsx"
+)
 
 # Write the output
 
 write_xlsx(output_list, path = file_path)
 
-
-
-
+rm(med_reviews, output_list, date_str, file_path)
