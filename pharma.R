@@ -5,7 +5,9 @@ library(writexl)
 
 # Read in pre-cleaned data
 
-med_reviews <- read_parquet("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/working/med_reviews_clean.parquet")
+med_reviews <- read_parquet(
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/working/med_reviews_clean.parquet"
+)
 
 # Summarise events by staff type and month, filter for Pharmacist
 
@@ -53,12 +55,12 @@ output_list <- list(
 # Generate the file path with the current date in YYYYMMDD format
 
 date_str <- format(Sys.Date(), "%Y%m%d")
-file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Shetland-PCPIP-indicators-", date_str, ".xlsx")
+file_path <- paste0(
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Shetland-PCPIP-indicators-",
+  date_str,
+  ".xlsx"
+)
 
 # Write the output
 
 write_xlsx(output_list, path = file_path)
-
-
-
-

@@ -1,4 +1,10 @@
-make_dt <- function(shared_data, var, name, keep_cols = NULL, percentage = FALSE) {
+make_dt <- function(
+  shared_data,
+  var,
+  name,
+  keep_cols = NULL,
+  percentage = FALSE
+) {
   # Only show relevant columns
   columns_to_show <- c("census_date", "PracticeID", var, keep_cols)
   indices_to_hide <- which(!(names(shared_data$data()) %in% columns_to_show))
