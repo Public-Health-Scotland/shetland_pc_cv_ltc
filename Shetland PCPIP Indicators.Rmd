@@ -13,7 +13,7 @@ output:
 
 These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient level data has been extracted from SHIP, it was then anonymised before being sent securely to PHS.
 
-The indicators are a Work In Progress, there may be issues with the indicator definition or  with the analysis methodology. We will work to improve them, iterating on feedback recieved. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
+The indicators are a Work In Progress, there may be issues with the indicator definition or  with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
 
 
 
