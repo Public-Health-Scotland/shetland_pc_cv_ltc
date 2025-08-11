@@ -2,11 +2,12 @@ library(dplyr)
 library(stringr) 
 library(lubridate) 
 library(nanoparquet) 
-library(fs) 
+library(fs)
+library (readr)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
-clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parquet"))
+clean_data <- read_parquet(path(dir, "data", "working", "may_25_clean_data.parquet"))
 
 #clean_data <- filter(clean_data, PracticeID != 3)
 
@@ -15,11 +16,11 @@ clean_data <- read_parquet(path(dir, "data", "working", "apr_25_clean_data.parqu
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
   filter(str_starts(EventType, "Record of Diagnosis")) |>
-  group_by(PatientID, PracticeID) |>   #do we need the PracticeID as we dont have Practice details
+  group_by(PatientID) |>   
   summarise(
     FirstDiag = min(EventDate),
-    DateOfDeath = first(DateOfDeath),    # do we need to add the Left Practice and Main Address Off Shetland?
-    LeftDate = first(LeftDate),
+    DateOfDeath = first(DateOfDeath),    
+    #JoinedDate = first(JoinedDate),
     LeftShetlandDate = first(LeftShetlandDate),
   )
 
@@ -38,14 +39,16 @@ ltc_attend <- clean_data |>
 # Read in population estimates for Shetland
 shetland_pops <- read_parquet(path(dir, "data", "lookups", "shetland_pops.parquet"))
 
-# Read in GP List sizes (aggregated to Shetland cluster level)
-shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_sizes.parquet"))
+# Read in GP List sizes (Shetland Practice List Sizes)
+shetland_list_sizes <- read_csv(path(dir, "data", "lookups", "shetland_list_sizes.csv"))
+
+#shetland_list_sizes <- read_parquet(path(dir, "data", "lookups", "shetland_list_sizes.parquet"))
 
 # Create a tibble of monthly dates
 months <- tibble(
   census_date = seq.Date(
     from = as.Date("2000-01-01"),
-    to = as.Date("2025-04-22"), #latest date available
+    to = as.Date("2025-05-31"), #latest date available
     by = "month"
   )
 )
@@ -88,9 +91,15 @@ first_diag_census <- left_join(
   # Join on condition that FirstDiag is before or on census_date
   by = join_by(FirstDiag <= census_date)
 ) |>
+  left_join(
+    clean_data |> select(PatientID, PracticeID, EventDate),
+    by = join_by(PatientID == PatientID, closest(census_date <= EventDate))
+  ) |> 
+  select(-EventDate) |> 
+  #fill(PracticeID, .direction = "down") |> 
   # Exclude records after death
   filter(is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month"))|> 
-  filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
+  #filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
   filter(is.na(LeftShetlandDate) | census_date <= floor_date(LeftShetlandDate, unit = "month"))
 
 census_data <- first_diag_census |>
@@ -116,13 +125,16 @@ monthly_summary <- census_data |>
   ungroup() |> 
   mutate(census_year = year(census_date)) |>
   left_join(shetland_pops, by = join_by(closest(census_year >= pop_year))) |>
-  left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date)))
+  #left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date)))
   
   ###Can be used once we can identify Practices#
-  #left_join(shetland_list_sizes, by = join_by(closest(census_date >= Date))) |>
-  #mutate(
-    #pop_prev = count / pop,
-    #list_prev = count / list_pop,
-   # ltc_invite_prop = ltc_invite_count / count,
-    #ltc_attend_prop = ltc_attend_count / count
-  #)
+  left_join(shetland_list_sizes, by = join_by (
+    PracticeID==PracticeID, closest(census_date >= Date))) |>
+  mutate(
+    list_prev = count / list_pop,
+    ltc_invite_prop = ltc_invite_count / count,
+    ltc_attend_prop = ltc_attend_count / count
+  ) |>
+  
+  select(PracticeID, census_date, list_prev, ltc_invite_prop, ltc_attend_prop)
+
