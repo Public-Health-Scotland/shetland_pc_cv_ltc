@@ -8,7 +8,7 @@ library(readr)
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 # Read in GP List sizes (aggregated to Shetland cluster level)
-
+# https://www.opendata.nhs.scot/dataset/gp-practice-populations
 shetland_list_sizes <- get_dataset(
   "gp-practice-populations",
   row_filters = list(HSCP = "S37000026"),
@@ -19,9 +19,14 @@ shetland_list_sizes <- get_dataset(
   group_by(Date, PracticeCode) |>
   summarise(list_pop = sum(AllAges), .groups = "drop")
 
-#new#
+# Practice codes / names
 ShetlandPractices <- read_csv(
-  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/ShetlandPractices.csv"
+  path(dir, "data", "lookups", "ShetlandPractices.csv"),
+  col_types = cols(
+    PracticeID = col_integer(),
+    PracticeCode = col_integer(),
+    PracticeName = col_character()
+  )
 )
 
 joined_data <- left_join(
@@ -30,15 +35,10 @@ joined_data <- left_join(
   by = 'PracticeCode'
 )
 
-write_csv(
+write_parquet(
   joined_data,
-  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/shetland_list_sizes.csv"
+  path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
+  compression = "zstd"
 )
-
-#write_parquet(
-#shetland_list_sizes,
-#path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
-#compression = "zstd"
-#)
 
 rm(list = ls())

@@ -41,13 +41,9 @@ shetland_pops <- read_parquet(path(
 ))
 
 # Read in GP List sizes (Shetland Practice List Sizes)
-shetland_list_sizes <- read_csv(path(
-  dir,
-  "data",
-  "lookups",
-  "shetland_list_sizes.csv"
-))
-
+shetland_list_sizes <- read_parquet(
+  path(dir, "data", "lookups", "shetland_list_sizes.parquet")
+)
 
 # Create a tibble of monthly dates
 months <- tibble(
