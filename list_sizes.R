@@ -20,16 +20,25 @@ shetland_list_sizes <- get_dataset(
   summarise(list_pop = sum(AllAges), .groups = "drop")
 
 #new#
-ShetlandPractices <- read_csv("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/ShetlandPractices.csv")
+ShetlandPractices <- read_csv(
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/ShetlandPractices.csv"
+)
 
-joined_data <-left_join(shetland_list_sizes, ShetlandPractices, by='PracticeCode')
+joined_data <- left_join(
+  shetland_list_sizes,
+  ShetlandPractices,
+  by = 'PracticeCode'
+)
 
-write_csv(joined_data,"/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/shetland_list_sizes.csv")
+write_csv(
+  joined_data,
+  "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/shetland_list_sizes.csv"
+)
 
 #write_parquet(
-  #shetland_list_sizes,
-  #path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
-  #compression = "zstd"
+#shetland_list_sizes,
+#path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
+#compression = "zstd"
 #)
 
 rm(list = ls())

@@ -12,11 +12,13 @@ dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 dir_ls(path(dir, "data", "raw")) |>
   path_file()
 
-#Code for using xlsx files
-#data_file_name <- "2025-05 - LIST - CV LTC.xlsx"
+# File name - UPDATE THIS
+data_file_name <- "2025-05 - LIST - CV LTC.xlsx"
+# File path
+data_file_path <- path(dir, "data", "raw", data_file_name)
 
-raw_data <-read_xlsx(
-  path = path(dir, "data", "raw", "2025-05 - LIST - CV LTC.xlsx"),
+raw_data <- read_xlsx(
+  path = data_file_path,
   col_types = c(
     "numeric",
     "numeric",
@@ -28,9 +30,9 @@ raw_data <-read_xlsx(
     "text"
   )
   # code for using csv files
-  #raw_data <-read_csv(
-  #  path = path(dir, "data", "raw", "File name.csv"),
-    #   cols(
+  # raw_data <-read_csv(
+  #  path = data_file_path,
+  #   cols(
   #   PatientID = col_integer(),
   #   PracticeID = col_integer(),
   #   EventCode = col_character(),
@@ -40,37 +42,49 @@ raw_data <-read_xlsx(
   #   DateOfDeath = col_date(format = "%d/%m/%Y"),
   #   EventType = col_character()
   # )
-)  
-  
-  
+)
+
 cleaned_filtered <- raw_data |>
   # 1899 dates are in a different format so will now be NA
   drop_na(EventDate) |>
   mutate(
     across(c(EventDate, DateOfDeath), as.Date),
     EventYear = year(EventDate)
-    ) |>
+  ) |>
   # One record is 1900-01-01 (obvious outlier) other records are in the future
   # We only need the latest ~4 years
   filter(between(EventYear, 1901, year(today())))
 
-
 # Adding a colums where EventType = Main Address Off Shetland,Left Practice and Joined Practice with a date
-cleaned_filtered <- cleaned_filtered %>% 
-  mutate(LeftShetlandDate = if_else(EventType == "Main Address Off Shetland",EventDate,NA)) %>%
-  group_by(PatientID)%>%
-  mutate(LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
-        LeftShetlandDate=na_if(LeftShetlandDate,as.Date(-Inf))) %>%  #clean up when there is no date for LeftShetlandDate
-  ungroup() %>% 
-  mutate(LeftDate = if_else(EventType == "Left Practice",EventDate,NA)) %>% 
-  group_by(PatientID, PracticeID)%>%
-  mutate(LeftDate = max(LeftDate, na.rm = TRUE),
-         LeftDate=na_if(LeftDate,as.Date(-Inf))) %>% #clean up when there is no date for LeftDate
+cleaned_filtered <- cleaned_filtered %>%
+  mutate(
+    LeftShetlandDate = if_else(
+      EventType == "Main Address Off Shetland",
+      EventDate,
+      NA
+    )
+  ) %>%
+  group_by(PatientID) %>%
+  mutate(
+    LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
+    LeftShetlandDate = na_if(LeftShetlandDate, as.Date(-Inf))
+  ) %>% # clean up when there is no date for LeftShetlandDate
   ungroup() %>%
-  mutate(JoinedDate = if_else(EventType == "Joined Practice",EventDate,NA)) %>% 
-  group_by(PatientID, PracticeID)%>%
-  mutate(JoinedDate = max(JoinedDate, na.rm = TRUE),
-         JoinedDate=na_if(JoinedDate,as.Date(-Inf))) %>% #clean up when there is no date for JoinedDate
+  mutate(LeftDate = if_else(EventType == "Left Practice", EventDate, NA)) %>%
+  group_by(PatientID, PracticeID) %>%
+  mutate(
+    LeftDate = max(LeftDate, na.rm = TRUE),
+    LeftDate = na_if(LeftDate, as.Date(-Inf))
+  ) %>% # clean up when there is no date for LeftDate
+  ungroup() %>%
+  mutate(
+    JoinedDate = if_else(EventType == "Joined Practice", EventDate, NA)
+  ) %>%
+  group_by(PatientID, PracticeID) %>%
+  mutate(
+    JoinedDate = max(JoinedDate, na.rm = TRUE),
+    JoinedDate = na_if(JoinedDate, as.Date(-Inf))
+  ) %>% # clean up when there is no date for JoinedDate
   ungroup()
 
 write_parquet(
