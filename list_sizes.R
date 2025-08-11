@@ -3,6 +3,7 @@ library(dplyr) # A Grammar of Data Manipulation
 library(lubridate) # Make Dealing with Dates a Little Easier
 library(fs) # Cross-Platform File System Operations Based on 'libuv'
 library(nanoparquet) # Read and Write 'Parquet' Files
+library(readr)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
@@ -15,13 +16,20 @@ shetland_list_sizes <- get_dataset(
 ) |>
   filter(Sex == "All") |>
   mutate(Date = ymd(Date)) |>
-  group_by(Date) |>
+  group_by(Date, PracticeCode) |>
   summarise(list_pop = sum(AllAges), .groups = "drop")
 
-write_parquet(
-  shetland_list_sizes,
-  path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
-  compression = "zstd"
-)
+#new#
+ShetlandPractices <- read_csv("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/ShetlandPractices.csv")
+
+joined_data <-left_join(shetland_list_sizes, ShetlandPractices, by='PracticeCode')
+
+write_csv(joined_data,"/conf/LIST_analytics/Shetland/Primary Care/LTC/data/lookups/shetland_list_sizes.csv")
+
+#write_parquet(
+  #shetland_list_sizes,
+  #path(dir, "data", "lookups", "shetland_list_sizes.parquet"),
+  #compression = "zstd"
+#)
 
 rm(list = ls())
