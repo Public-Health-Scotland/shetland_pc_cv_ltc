@@ -119,13 +119,13 @@ filter_checkbox(
 
 ### Cardiovascular disease prevelance
 
-This looks at the counts of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
+This looks at the prevalence of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
 
 ```{r cv_prev_plotly}
 cv_prev_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~count,
+  y = ~list_prev,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -133,12 +133,15 @@ cv_prev_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Count:", count)
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>CV Prevelance:", percent(list_prev, accuracy = 0.1))
 ) |>
   layout(
-    title = str_wrap("Monthly CV Prevelance count per GP Practice", 25),
+    title = str_wrap("Monthly CV Prevelance percentage by GP Practice", 25),
     xaxis = list(title = "Month"),
-    yaxis = list(title = "Count"),
+    yaxis = list(
+      title = "CV Prevelance percentage",
+      tickformat = ".1%"
+    ),
     showlegend = TRUE,
     legend = list(
       title = list(text = "Practice ID")
@@ -149,9 +152,9 @@ cv_prev_plotly <- plot_ly(
 ```{r cv_prev_dt}
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "count",
-  name = "Prevelance count",
-  percentage = FALSE
+  var = "list_prev",
+  name = "CV prevelance percentage",
+  percentage = TRUE
 )
 ```
 
