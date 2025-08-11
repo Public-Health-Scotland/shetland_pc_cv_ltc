@@ -1,4 +1,5 @@
 library(dplyr)
+library(tidyr)
 library(stringr)
 library(lubridate)
 library(nanoparquet)
@@ -107,10 +108,17 @@ first_diag_census <- left_join(
   # Join on condition that FirstDiag is before or on census_date
   by = join_by(FirstDiag <= census_date)
 ) |>
+  # This assigns each patient to a practice for each month.
   left_join(
-    clean_data |> select(PatientID, PracticeID, EventDate),
-    by = join_by(PatientID == PatientID, closest(census_date <= EventDate))
+    clean_data |>
+      select(PatientID, PracticeID, EventDate) |>
+      arrange(PatientID, EventDate) |>
+      distinct(PatientID, PracticeID, .keep_all = TRUE),
+    by = join_by(PatientID == PatientID, closest(census_date <= EventDate)),
+    relationship = "many-to-one"
   ) |>
+  arrange(PatientID, EventDate) |>
+  fill(PracticeID, .direction = "downup") |>
   select(-EventDate) |>
   # Exclude records after death
   filter(
