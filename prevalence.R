@@ -50,7 +50,7 @@ shetland_list_sizes <- read_parquet(
 months <- tibble(
   census_date = seq.Date(
     from = as.Date("2020-01-01"),
-    to = as.Date("2025-05-31"), # latest date available
+    to = as.Date("2025-06-01"), # latest date available
     by = "month"
   )
 )
