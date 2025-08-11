@@ -85,7 +85,12 @@ cleaned_filtered <- cleaned_filtered %>%
     JoinedDate = max(JoinedDate, na.rm = TRUE),
     JoinedDate = na_if(JoinedDate, as.Date(-Inf))
   ) %>% # clean up when there is no date for JoinedDate
-  ungroup()
+  ungroup() |>
+  filter(
+    EventType != "Main Address Off Shetland",
+    EventType != "Left Practice",
+    EventType != "Joined Practice"
+  )
 
 write_parquet(
   cleaned_filtered,
