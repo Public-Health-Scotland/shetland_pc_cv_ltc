@@ -179,7 +179,14 @@ monthly_summary <- census_data |>
     ltc_invite_prop = ltc_invite_count / count,
     ltc_attend_prop = ltc_attend_count / count
   ) |>
-  select(PracticeID, census_date, list_prev, ltc_invite_prop, ltc_attend_prop)
+  select(
+    PracticeID,
+    census_date,
+    count,
+    list_prev,
+    ltc_invite_prop,
+    ltc_attend_prop
+  )
 
 rm(
   "census_data",
