@@ -61,9 +61,8 @@ all_data <- monthly_summary |>
   filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
     census_date = as.Date(census_date),
-    PracticeID = factor(PracticeID),
-    show_legend_flag = !duplicated(DerivedEventType)
-  )
+    PracticeID = factor(PracticeID)
+    )
 
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
@@ -356,7 +355,13 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
   group_by(PracticeID) %>%
   group_map(
     \(practice_data, practice_id) {
-      practice_id <- paste("Practice ", practice_id)
+      practice_id_label <- paste("Practice ", practice_id)
+      
+      first_practice_id <- unique(pull(
+        shared_monthly_summary$data(), 
+        PracticeID
+        ))[1]
+      is_first_practice <- as.integer(practice_id) == first_practice_id
 
       plot_ly(
         data = practice_data,
@@ -364,8 +369,7 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         y = ~event_type_proportion,
         color = ~DerivedEventType,
         colors = event_type_colours,
-        symbol = ~PracticeID,
-        symbols = practice_symbols,
+        marker = list(size = 8),
         type = "scatter",
         mode = "lines+markers",
         hoverinfo = "text",
@@ -376,10 +380,10 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         ),
         legendgroup = ~DerivedEventType,
         name = ~DerivedEventType,
-        showlegend = ~ any(show_legend_flag)
+        showlegend = is_first_practice
       ) |>
         layout(
-          title = list(text = practice_id, font = list(size = 12)),
+          title = list(text = practice_id_label, font = list(size = 12)),
           hovermode = "x",
           showlegend = FALSE,
           # Set titles to empty strings to prevent them from showing on individual subplots.
