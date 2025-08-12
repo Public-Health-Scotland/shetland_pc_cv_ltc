@@ -2,7 +2,7 @@
 title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
-output:
+output: 
   html_document:
     css: phs_style.css
     toc: true
@@ -111,7 +111,7 @@ practice_symbols <- setNames(
 
 Select one or more GP Practices here; by default, all practices are shown, however viewing 9 practices on a single plot will often look quite chaotic!
 
-All plots and data tables will be filtered to the selected practice(s).
+All plots and data tables will be filtered to the selected practice(s). 
 
 ```{r interactive_filter}
 # Function to dynamically determine the number of columns
@@ -134,7 +134,7 @@ filter_checkbox(
 
 ## Long Term Conditions
 
-### Cardiovascular disease prevalence
+### Cardiovascular disease prevelance
 
 This looks at the prevalence of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
 
@@ -156,7 +156,7 @@ cv_prev_plotly <- plot_ly(
     title = str_wrap("Monthly CV Prevelance percentage by GP Practice", 25),
     xaxis = list(title = "Month"),
     yaxis = list(
-      title = "CV Prevalence percentage",
+      title = "CV Prevelance percentage",
       tickformat = ".1%"
     ),
     showlegend = TRUE,
@@ -170,7 +170,7 @@ cv_prev_plotly <- plot_ly(
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
   var = "list_prev",
-  name = "CV prevalence percentage",
+  name = "CV prevelance percentage",
   percentage = TRUE
 )
 ```
