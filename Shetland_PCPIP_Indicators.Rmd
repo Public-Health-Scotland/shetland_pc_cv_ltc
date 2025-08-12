@@ -363,7 +363,7 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         x = ~census_date,
         y = ~event_type_proportion,
         color = ~DerivedEventType,
-        colours = event_type_colours,
+        colors = event_type_colours,
         symbol = ~PracticeID,
         symbols = practice_symbols,
         type = "scatter",
