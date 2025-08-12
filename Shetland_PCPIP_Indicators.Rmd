@@ -349,7 +349,7 @@ subplot_title_annotations <- create_subplot_title_annotations(
   subplot_margin = subplot_margin_value
 )
 
-event_type_colours <- phs_colours(c("phs-purple", "phs-magenta", "phs-blue")) |>
+event_type_colours <- c("#12436D", "#28A197", "#801650") |>
   setNames(unique(pull(quarterly_event_type, DerivedEventType)))
 
 pharm_9_plotly <- shared_monthly_summary$data() |>
