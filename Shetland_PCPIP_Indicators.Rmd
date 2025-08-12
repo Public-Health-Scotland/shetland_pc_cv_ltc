@@ -78,8 +78,26 @@ shared_monthly_summary <- SharedData$new(
 practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
 n_practices <- length(practice_ids)
 
+phs_accessible_colours <- c(
+  "#12436D",  # Dark Blue
+  "#28A197",  # Turquoise
+  "#801650",  # Pink
+  "#F46A25",  # Orange
+  "#3D3D3D",  # Grey
+  "#3E8ECC",  # Light Blue
+  "#3F085C",  # Dark Purple
+  "#94AABD",  # Dark Blue Tint
+  "#B4DEDB",  # Turquoise Tint
+  "#CCA2B9",  # Pink Tint
+  "#FBC3A8",  # Orange Tint
+  "#A8A8A8",  # Grey Tint
+  "#A8CCE8",  # Light Blue Tint
+  "#A285D1"   # Light Purple
+)
+
+
 practice_colours <- setNames(
-  object = phs_colors()[seq_along(practice_ids)],
+  object = phs_accessible_colours[seq_along(practice_ids)],
   nm = practice_ids
 )
 
