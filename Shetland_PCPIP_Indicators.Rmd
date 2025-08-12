@@ -274,8 +274,8 @@ cv_ctac_2_dt <- make_dt(
 
 ```{r display_cv_ctac_2_elements}
 # Display the plot and table
-# Arrange plot and table side-by-side on large screens, or stacked on smaller ones.
-bscols(cv_ctac_2_plotly, cv_ctac_2_dt, widths = c(6, 6), device = "lg")
+cv_ctac_2_plotly
+cv_ctac_2_dt
 ```
 
 ## Pharmacotherapy
