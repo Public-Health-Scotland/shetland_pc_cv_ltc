@@ -58,7 +58,7 @@ all_data <- monthly_summary |>
     quarterly_event_type,
     by = join_by(census_date == quarter_start, PracticeID)
   ) |>
-  filter(census_date >= as.Date("2021-11-01")) |>
+  filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
     census_date = as.Date(census_date),
     PracticeID = factor(PracticeID),
