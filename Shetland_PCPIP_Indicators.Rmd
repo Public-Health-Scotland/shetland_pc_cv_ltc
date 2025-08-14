@@ -150,7 +150,13 @@ cv_prev_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>CV Prevalence:", percent(list_prev, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID, 
+    "<br>Month:", census_date, 
+    "<br>CV Prevalence:", percent(list_prev, accuracy = 0.1),
+    "<br>List size:", list_pop,
+    "<br>CV patients count:", ltc_prev_count
+    )
 ) |>
   layout(
     title = str_wrap("Monthly CV Prevalence percentage by GP Practice", 25),

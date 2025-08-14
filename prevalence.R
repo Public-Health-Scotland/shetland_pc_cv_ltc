@@ -153,11 +153,11 @@ census_data <- first_diag_census |>
 monthly_summary <- census_data |>
   group_by(census_date, PracticeID) |>
   summarise(
-    count = n_distinct(PatientID),
+    ltc_prev_count = n_distinct(PatientID),
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    ltc_invite_prop = ltc_invite_count / count,
-    ltc_attend_prop = ltc_attend_count / count
+    ltc_invite_prop = ltc_invite_count / ltc_prev_count,
+    ltc_attend_prop = ltc_attend_count / ltc_prev_count
   ) |>
   ungroup() |>
   mutate(census_year = year(census_date)) |>
@@ -174,16 +174,13 @@ monthly_summary <- census_data |>
       closest(census_date >= Date)
     )
   ) |>
-  mutate(
-    list_prev = count / list_pop,
-    ltc_invite_prop = ltc_invite_count / count,
-    ltc_attend_prop = ltc_attend_count / count
-  ) |>
+  mutate(list_prev = ltc_prev_count / list_pop) |>
   select(
     PracticeID,
     census_date,
-    count,
+    ltc_prev_count,
     list_prev,
+    list_pop,
     ltc_invite_prop,
     ltc_attend_prop
   )
