@@ -66,7 +66,7 @@ final_data <- left_join(
 )
 
 # Summarise for both 90 and 180 day splits
-final_data_summarised <- final_data |>
+pharma_1_monthly <- final_data |>
   group_by(PracticeID, census_date) |>
   summarise(
     patients_on_repeat_presc = n_distinct(PatientID),
@@ -78,7 +78,7 @@ final_data_summarised <- final_data |>
   ungroup()
 
 # Plot both proportions
-ggplot(final_data_summarised, aes(x = census_date)) +
+ggplot(pharma_1_monthly, aes(x = census_date)) +
   geom_line(aes(y = prop_review_180, colour = "180-day")) +
   geom_line(aes(y = prop_review_90, colour = "90-day")) +
   facet_wrap(~PracticeID) +
@@ -91,7 +91,7 @@ ggplot(final_data_summarised, aes(x = census_date)) +
 
 
 # Export to Excel
-write_xlsx(final_data_summarised, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Pharma_med_reviews_90_180.xlsx")
+write_xlsx(pharma_1_monthly, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Pharma_med_reviews_90_180.xlsx")
 
 
 
