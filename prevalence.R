@@ -114,7 +114,7 @@ first_diag_census <- left_join(
       select(PatientID, PracticeID, EventDate) |>
       arrange(PatientID, EventDate) |>
       distinct(PatientID, PracticeID, .keep_all = TRUE),
-    by = join_by(PatientID == PatientID, closest(census_date <= EventDate)),
+    by = join_by(PatientID == PatientID, closest(census_date >= EventDate)),
     relationship = "many-to-one"
   ) |>
   arrange(PatientID, EventDate) |>
