@@ -89,7 +89,8 @@ cleaned_filtered <- cleaned_filtered %>%
   filter(
     EventType != "Main Address Off Shetland",
     EventType != "Left Practice",
-    EventType != "Joined Practice"
+    EventType != "Joined Practice",
+    EventType != "Date of Death"
   )
 
 write_parquet(
