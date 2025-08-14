@@ -105,7 +105,7 @@ first_diag_census <- left_join(
   first_diag,
   months,
   # Join on condition that FirstDiag is before or on census_date
-  by = join_by(FirstDiag <= census_date)
+  by = join_by(FirstDiag + months(15) <= census_date)
 ) |>
   # This assigns each patient to a practice for each month.
   left_join(
