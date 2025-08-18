@@ -2,7 +2,7 @@
 title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
-output: 
+output:
   html_document:
     css: phs_style.css
     toc: true
@@ -13,9 +13,7 @@ output:
 
 These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient level data has been extracted from SHIP, it was then anonymised before being sent securely to PHS.
 
-The indicators are a Work In Progress, there may be issues with the indicator definition or  with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
-
-
+The indicators are a Work In Progress, there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -58,12 +56,11 @@ all_data <- monthly_summary |>
     quarterly_event_type,
     by = join_by(census_date == quarter_start, PracticeID)
   ) |>
-  filter(census_date >= as.Date("2021-11-01")) |>
+  filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
     census_date = as.Date(census_date),
-    PracticeID = factor(PracticeID),
-    show_legend_flag = !duplicated(DerivedEventType)
-  )
+    PracticeID = factor(PracticeID)
+    )
 
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
@@ -78,8 +75,26 @@ shared_monthly_summary <- SharedData$new(
 practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
 n_practices <- length(practice_ids)
 
+phs_accessible_colours <- c(
+  "#12436D",  # Dark Blue
+  "#28A197",  # Turquoise
+  "#801650",  # Pink
+  "#F46A25",  # Orange
+  "#3D3D3D",  # Grey
+  "#3E8ECC",  # Light Blue
+  "#3F085C",  # Dark Purple
+  "#94AABD",  # Dark Blue Tint
+  "#B4DEDB",  # Turquoise Tint
+  "#CCA2B9",  # Pink Tint
+  "#FBC3A8",  # Orange Tint
+  "#A8A8A8",  # Grey Tint
+  "#A8CCE8",  # Light Blue Tint
+  "#A285D1"   # Light Purple
+)
+
+
 practice_colours <- setNames(
-  object = phs_colors()[seq_along(practice_ids)],
+  object = phs_accessible_colours[seq_along(practice_ids)],
   nm = practice_ids
 )
 
@@ -90,11 +105,11 @@ practice_symbols <- setNames(
 )
 ```
 
-## GP Practice section
+## GP Practice selection
 
 Select one or more GP Practices here; by default, all practices are shown, however viewing 9 practices on a single plot will often look quite chaotic!
 
-All plots and data tables will be filtered to the selected practice(s). 
+All plots and data tables will be filtered to the selected practice(s).
 
 ```{r interactive_filter}
 # Function to dynamically determine the number of columns
@@ -117,7 +132,7 @@ filter_checkbox(
 
 ## Long Term Conditions
 
-### Cardiovascular disease prevelance
+### Cardiovascular disease prevalence
 
 This looks at the prevalence of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
 
@@ -133,13 +148,19 @@ cv_prev_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>CV Prevelance:", percent(list_prev, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID, 
+    "<br>Month:", census_date, 
+    "<br>CV Prevalence:", percent(list_prev, accuracy = 0.1),
+    "<br>List size:", list_pop,
+    "<br>CV patients count:", ltc_prev_count
+    )
 ) |>
   layout(
-    title = str_wrap("Monthly CV Prevelance percentage by GP Practice", 25),
+    title = str_wrap("Monthly CV Prevalence percentage by GP Practice", 25),
     xaxis = list(title = "Month"),
     yaxis = list(
-      title = "CV Prevelance percentage",
+      title = "CV Prevalence percentage",
       tickformat = ".1%"
     ),
     showlegend = TRUE,
@@ -153,7 +174,7 @@ cv_prev_plotly <- plot_ly(
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
   var = "list_prev",
-  name = "CV prevelance percentage",
+  name = "CV prevalence percentage",
   percentage = TRUE
 )
 ```
@@ -257,8 +278,8 @@ cv_ctac_2_dt <- make_dt(
 
 ```{r display_cv_ctac_2_elements}
 # Display the plot and table
-# Arrange plot and table side-by-side on large screens, or stacked on smaller ones.
-bscols(cv_ctac_2_plotly, cv_ctac_2_dt, widths = c(6, 6), device = "lg")
+cv_ctac_2_plotly
+cv_ctac_2_dt
 ```
 
 ## Pharmacotherapy
@@ -331,23 +352,31 @@ subplot_title_annotations <- create_subplot_title_annotations(
   subplot_margin = subplot_margin_value
 )
 
-event_type_colours <- phs_colours(c("phs-purple", "phs-magenta", "phs-blue")) |>
+event_type_colours <- c("#12436D", "#28A197", "#801650") |>
   setNames(unique(pull(quarterly_event_type, DerivedEventType)))
 
 pharm_9_plotly <- shared_monthly_summary$data() |>
   group_by(PracticeID) %>%
   group_map(
     \(practice_data, practice_id) {
-      practice_id <- paste("Practice ", practice_id)
+      practice_id_label <- paste("Practice ", practice_id)
+
+      first_practice_id <- unique(pull(
+        shared_monthly_summary$data(),
+        PracticeID
+        ))[1]
+      is_first_practice <- as.integer(practice_id) == first_practice_id
 
       plot_ly(
         data = practice_data,
         x = ~census_date,
         y = ~event_type_proportion,
         color = ~DerivedEventType,
-        colours = event_type_colours,
+        colors = event_type_colours,
         symbol = ~PracticeID,
         symbols = practice_symbols,
+        marker = list(size = 8),
+        line = list(size = 2),
         type = "scatter",
         mode = "lines+markers",
         hoverinfo = "text",
@@ -358,10 +387,10 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         ),
         legendgroup = ~DerivedEventType,
         name = ~DerivedEventType,
-        showlegend = ~ any(show_legend_flag)
+        showlegend = is_first_practice
       ) |>
         layout(
-          title = list(text = practice_id, font = list(size = 12)),
+          title = list(text = practice_id_label, font = list(size = 12)),
           hovermode = "x",
           showlegend = FALSE,
           # Set titles to empty strings to prevent them from showing on individual subplots.
