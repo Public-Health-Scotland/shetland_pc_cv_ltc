@@ -77,18 +77,6 @@ pharma_1_monthly <- final_data |>
   ) |>
   ungroup()
 
-# Plot both proportions
-ggplot(pharma_1_monthly, aes(x = census_date)) +
-  geom_line(aes(y = prop_review_180, colour = "180-day")) +
-  geom_line(aes(y = prop_review_90, colour = "90-day")) +
-  facet_wrap(~PracticeID) +
-  labs(
-    title = "Proportion of Medication Reviews within 90 and 180 Days of Birthday",
-    y = "Proportion",
-    colour = "Review Window"
-  ) +
-  theme_minimal()
-
 
 # Export to Excel
 write_xlsx(pharma_1_monthly, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Pharma_med_reviews_90_180.xlsx")
