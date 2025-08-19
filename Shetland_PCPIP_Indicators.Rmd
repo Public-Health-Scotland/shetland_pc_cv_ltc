@@ -50,7 +50,8 @@ source("functions/create_subplot_title_annotations.R")
 all_data <- monthly_summary |>
   left_join(
     pharmacist_reviews,
-    by = join_by(census_date, PracticeID)
+    by = join_by(census_date, PracticeID),
+    relationship = "one-to-one"
   ) |>
   left_join(
     quarterly_event_type,
