@@ -133,9 +133,17 @@ filter_checkbox(
 
 ## Long Term Conditions
 
+For identifying patients with a long-term condition, we look for a relevant 'Record of Diagnosis' event and start counting them from that month onwards. We will stop counting a patient if they die, or if we have a record indicating that they have left Shetland. We carry out this process Shetland-wide and assign patients to a practice based on their most recent data. This method is quite reliable, as it takes into account any 'Joined practice' events, and it remains effective even if some information hasn't been coded or updated.
+
+Our methodology differs from SHIP in at least these known ways:
+
+-   We start counting a patient immediately from diagnosis, whereas SHIP implements a 15-month lag from the first diagnosis.
+
+-   SHIP 'allows' some LTCs to be 'resolved', we count patients in perpetuity (unless we know they have died or left Shetland).
+
 ### Cardiovascular disease prevalence
 
-This looks at the prevalence of patients identified as having Cardiovascular Disease per practice. This is relevant as it is these patients that are used as the denominator in the following indicators.
+This looks at the prevalence of patients identified as having Cardiovascular Disease per practice. This is relevant because these patients are used as the denominator in the calculation of the subsequent indicators.
 
 ```{r cv_prev_plotly}
 cv_prev_plotly <- plot_ly(
