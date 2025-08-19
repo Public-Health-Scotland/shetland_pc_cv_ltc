@@ -2,7 +2,6 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 library(readxl)
-library(ggplot2)
 library(writexl)
 
 # Load data
