@@ -48,7 +48,7 @@ med_review_bday <- med_reviews |>
     # Use most recent birthday before or on review date
     BirthDate = if_else(EventDate >= birthday_this_year, birthday_this_year, birthday_last_year),
     # Days since birth date
-    DaysFromBirth = as.numeric(difftime(EventDate, BirthDate, units = "days")),
+    DaysFromBirth = as.integer(difftime(EventDate, BirthDate, units = "days")),
     # Flags for reviews within 90 and 180 days *after* birth date
     within_90 = DaysFromBirth >= 0 & DaysFromBirth <= 90,
     within_180 = DaysFromBirth >= 0 & DaysFromBirth <= 180
