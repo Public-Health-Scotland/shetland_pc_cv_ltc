@@ -52,13 +52,13 @@ months <- tibble(
     from = as.Date("2020-01-01"),
     to = as.Date("2025-06-01"), # latest date available
     by = "month"
-  )
+  ),
+  census_date_minus15 = census_date - months(15)
 )
 
 ltc_invite_census <- left_join(
   ltc_invite,
-  months |>
-    mutate(census_date_minus15 = census_date - months(15)),
+  months,
   by = join_by(within(
     ltc_invite_date,
     ltc_invite_date,
@@ -89,8 +89,7 @@ ltc_invite_attend_census <- left_join(
 
 ltc_attend_census <- left_join(
   ltc_attend,
-  months |>
-    mutate(census_date_minus15 = census_date - months(15)),
+  months,
   by = join_by(within(
     ltc_attend_date,
     ltc_attend_date,
@@ -111,15 +110,16 @@ first_diag_census <- left_join(
   # This assigns each patient to a practice for each month.
   left_join(
     clean_data |>
-      select(PatientID, PracticeID, EventDate) |>
+      select(PatientID, PracticeID, EventDate, JoinedDate) |>
       arrange(PatientID, EventDate) |>
       distinct(PatientID, PracticeID, .keep_all = TRUE),
-    by = join_by(PatientID == PatientID, closest(census_date <= EventDate)),
+    by = join_by(PatientID == PatientID, closest(census_date >= EventDate)),
+    multiple = "last", # Use the latest practice joined if 2 events on the same day
     relationship = "many-to-one"
   ) |>
   arrange(PatientID, EventDate) |>
   fill(PracticeID, .direction = "downup") |>
-  select(-EventDate) |>
+  select(-EventDate, -JoinedDate) |>
   # Exclude records after death
   filter(
     is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")
@@ -153,20 +153,13 @@ census_data <- first_diag_census |>
 monthly_summary <- census_data |>
   group_by(census_date, PracticeID) |>
   summarise(
-    count = n_distinct(PatientID),
+    ltc_prev_count = n_distinct(PatientID),
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    ltc_invite_prop = ltc_invite_count / count,
-    ltc_attend_prop = ltc_attend_count / count
+    ltc_invite_prop = ltc_invite_count / ltc_prev_count,
+    ltc_attend_prop = ltc_attend_count / ltc_prev_count
   ) |>
   ungroup() |>
-  mutate(census_year = year(census_date)) |>
-  left_join(
-    shetland_pops,
-    by = join_by(
-      closest(census_year >= pop_year)
-    )
-  ) |>
   left_join(
     shetland_list_sizes,
     by = join_by(
@@ -174,16 +167,13 @@ monthly_summary <- census_data |>
       closest(census_date >= Date)
     )
   ) |>
-  mutate(
-    list_prev = count / list_pop,
-    ltc_invite_prop = ltc_invite_count / count,
-    ltc_attend_prop = ltc_attend_count / count
-  ) |>
+  mutate(list_prev = ltc_prev_count / list_pop) |>
   select(
     PracticeID,
     census_date,
-    count,
+    ltc_prev_count,
     list_prev,
+    list_pop,
     ltc_invite_prop,
     ltc_attend_prop
   )
