@@ -13,36 +13,23 @@ dir_ls(path(dir, "data", "raw")) |>
   path_file()
 
 # File name - UPDATE THIS
-data_file_name <- "2025-05 - LIST - CV LTC.xlsx"
+data_file_name <- "2025-07 - LIST - CV LTC with ltc resolved events.zip"
 # File path
 data_file_path <- path(dir, "data", "raw", data_file_name)
 
-raw_data <- read_xlsx(
-  path = data_file_path,
-  col_types = c(
-    PatientID = "numeric",
-    PracticeID = "numeric",
-    DayOfBirth = "skip",
-    MonthOfBirth = "skip",
-    EventCode = "skip",
-    EventDate = "date",
-    DateOfDeath = "date",
-    EventType = "text"
+raw_data <- unzip(zipfile = data_file_path) |>
+  read_xlsx(
+    col_types = c(
+      PatientID = "numeric",
+      PracticeID = "numeric",
+      DayOfBirth = "skip",
+      MonthOfBirth = "skip",
+      EventCode = "skip",
+      EventDate = "date",
+      DateOfDeath = "date",
+      EventType = "text"
+    )
   )
-  # code for using csv files
-  # raw_data <-read_csv(
-  #  path = data_file_path,
-  #   cols(
-  #   PatientID = col_integer(),
-  #   PracticeID = col_integer(),
-  #   EventCode = col_character(),
-  #   DayOfBirth = col_integer(),
-  #   MonthOfBirth = col_integer(),
-  #   EventDate = col_date(format = "%d/%m/%Y"),
-  #   DateOfDeath = col_date(format = "%d/%m/%Y"),
-  #   EventType = col_character()
-  # )
-)
 
 cleaned_filtered <- raw_data |>
   # 1899 dates are in a different format so will now be NA
@@ -92,7 +79,7 @@ cleaned_filtered <- cleaned_filtered |>
 
 write_parquet(
   cleaned_filtered,
-  path(dir, "data", "working", "may_25_clean_data.parquet"), # will need to update every time a new extract
+  path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet"), # will need to update every time a new extract
   compression = "zstd"
 )
 
