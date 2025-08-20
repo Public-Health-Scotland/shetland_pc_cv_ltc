@@ -5,22 +5,46 @@ library(lubridate)
 library(nanoparquet)
 library(fs)
 library(readr)
+library(dtplyr)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 clean_data <- read_parquet(
-  path(dir, "data", "working", "may_25_clean_data.parquet")
+  path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet")
 )
 
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
-  filter(str_starts(EventType, "Record of Diagnosis")) |>
+  filter(str_ends(EventType, "Code")) |>
+  separate_wider_delim(
+    cols = EventType,
+    delim = regex("\\s+?-\\s+?"),
+    names = c("ltc", "type")
+  ) |>
+  lazy_dt() |>
+  group_by(PatientID, ltc) |>
+  mutate(
+    FirstDiag = na_if(
+      min(EventDate[type == "Diagnosis Code"], na.rm = TRUE),
+      as.Date(Inf)
+    ),
+    Resolution = na_if(
+      max(EventDate[type == "Resolved Code"], na.rm = TRUE),
+      as.Date(-Inf)
+    )
+  ) |>
+  drop_na(FirstDiag) |>
   group_by(PatientID) |>
   summarise(
-    FirstDiag = min(EventDate),
+    FirstDiag = min(FirstDiag),
+    Resolution = max(Resolution),
     DateOfDeath = first(DateOfDeath),
-    LeftShetlandDate = first(LeftShetlandDate),
-  )
+    LeftShetlandDate = first(LeftShetlandDate)
+  ) |>
+  ungroup() |>
+  collect() |>
+  # Clear resolved codes that happen before diagnosis
+  mutate(Resolution = if_else(Resolution < FirstDiag, NA_Date_, Resolution))
 
 # LTC Invite
 ltc_invite <- clean_data |>
@@ -120,6 +144,10 @@ first_diag_census <- left_join(
   arrange(PatientID, EventDate) |>
   fill(PracticeID, .direction = "downup") |>
   select(-EventDate, -JoinedDate) |>
+  # Exclude resolved conditions
+  filter(
+    is.na(Resolution) | census_date <= floor_date(Resolution, unit = "month")
+  ) |>
   # Exclude records after death
   filter(
     is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")
