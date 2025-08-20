@@ -146,9 +146,9 @@ For identifying patients with a long-term condition, we look for a relevant 'Rec
 
 Our methodology differs from SHIP in at least these known ways:
 
--   We start counting a patient immediately from diagnosis, whereas SHIP implements a 15-month lag from the first diagnosis.
+-   We start counting a patient immediately from diagnosis, whereas SHIP implements a 15-month lag from the first diagnosis when assessing if a review is due (this affects the invite and attendance indicators.
 
--   SHIP 'allows' some LTCs to be 'resolved', we count patients in perpetuity (unless we know they have died or left Shetland).
+-   ~~SHIP 'allows' some LTCs to be 'resolved', we count patients in perpetuity (unless we know they have died or left Shetland).~~
 
 ### Cardiovascular disease prevalence
 
