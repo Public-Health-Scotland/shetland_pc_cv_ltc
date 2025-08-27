@@ -41,6 +41,11 @@ source("prevalence.R")
 source("pharma.R")
 ```
 
+
+```{r get_pharma_1_data, include=FALSE}
+source("pharma1.R")
+```
+
 ```{r source_functions}
 source("functions/make_dt.R")
 source("functions/create_subplot_title_annotations.R")
@@ -56,6 +61,10 @@ all_data <- monthly_summary |>
   left_join(
     quarterly_event_type,
     by = join_by(census_date == quarter_start, PracticeID)
+  ) |>
+  left_join(
+    pharma_1_monthly,
+    by = join_by(census_date, PracticeID)
   ) |>
   filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
@@ -474,3 +483,100 @@ pharm_9_dt <- make_dt(
 pharm_9_plotly
 pharm_9_dt
 ```
+
+### Completed Medication Reviews (90 days)
+
+This indicator is defined as *% of people on regular medication who have had a medication review completed within 90 days of birth month*. Specifically:
+
+NUMERATOR: Number of people coded as having a medication review completed within 90 days of birth month
+
+DENOMINATOR: Total number of people who have been issued a repeat prescription in the previous 12 months
+
+```{r pharma1_90_plotly}
+# It uses the shared data, so it will update based on the filter
+pharma1_90_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~prop_review_90,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Proportion Reviewed (90 days)", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r pharma1_90_dt}
+pharma1_90_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "prop_review_90",
+  name = "Proportion Reviewed (90 days)",
+  percentage = TRUE
+)
+```
+
+```{r display_pharma1_90}
+# Display the plot and table
+pharma1_90_plotly
+pharma1_90_dt
+```
+
+### Completed Medication Reviews (180 days)
+
+This indicator is defined as *% of people on regular medication who have had a medication review completed within 180 days of birth month*. Specifically:
+
+NUMERATOR: Number of people coded as having a medication review completed within 180 days of birth month
+
+DENOMINATOR: Total number of people who have been issued a repeat prescription in the previous 12 months
+
+```{r pharma1__180plotly}
+# It uses the shared data, so it will update based on the filter
+pharma1_180_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~prop_review_180,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(prop_review_180, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Proportion Reviewed (180 days)", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r pharma1_180_dt}
+pharma1_180_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "prop_review_180",
+  name = "Proportion Reviewed (180 days)",
+  percentage = TRUE
+)
+```
+
+```{r display_pharma1_180}
+# Display the plot and table
+pharma1_180_plotly
+pharma1_180_dt
+```
+
