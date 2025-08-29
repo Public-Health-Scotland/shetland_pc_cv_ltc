@@ -33,6 +33,7 @@ library(scales)
 library(plotly)
 library(DT)
 library(phsstyles)
+library(openxlsx)
 ```
 
 ```{r get_prev_data, include=FALSE}
@@ -542,3 +543,27 @@ pharma1_180_plotly
 pharma1_180_dt
 ```
 
+```{r export-all-data-frames, message=FALSE, warning=FALSE}
+# Create the named list of data frames and their sheet names
+all_data_frames <- list(
+  all_data = all_data,
+  monthly_event_type = monthly_event_type,
+  monthly_summary = monthly_summary,
+  pharma_1_monthly = pharma_1_monthly,
+  pharmacist_reviews = pharmacist_reviews,
+  quarterly_event_type = quarterly_event_type
+)
+
+# Create a new workbook
+wb <- createWorkbook()
+
+# Add each data frame as a sheet and set column widths to auto
+for (sheet_name in names(all_data_frames)) {
+  addWorksheet(wb, sheet_name)
+  writeData(wb, sheet_name, all_data_frames[[sheet_name]])
+  setColWidths(wb, sheet = sheet_name, cols = 1:ncol(all_data_frames[[sheet_name]]), widths = "auto")
+}
+
+# Save the workbook to the specified path
+file_path <- "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Indicators.xlsx"
+saveWorkbook(wb, file_path, overwrite = TRUE)
