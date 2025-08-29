@@ -77,8 +77,9 @@ all_data <- monthly_summary |>
   filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
     census_date = as.Date(census_date),
-    PracticeID = factor(PracticeID)
-    )
+    PracticeID = factor(PracticeID),
+    across(where(is.numeric), \(x) replace_na(x, 0L))
+    ) 
 
 practice_ids <- unique(sort(all_data[["PracticeID"]]))
 n_practices <- length(practice_ids)
