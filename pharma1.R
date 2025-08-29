@@ -28,7 +28,7 @@ repeat_prescription <- med_reviews |>
   rename(repeat_presc_issue_date = EventDate)
 
 # Join with census months
-denominator <- left_join(
+patients_on_repeat_presc <- left_join(
   repeat_prescription,
   months |>
     mutate(
@@ -60,7 +60,7 @@ med_review_bday <- med_reviews |>
 
 # Join with denominator
 final_data <- left_join(
-  denominator,
+  patients_on_repeat_presc,
   med_review_bday,
   by = join_by(
     PatientID == PatientID,
