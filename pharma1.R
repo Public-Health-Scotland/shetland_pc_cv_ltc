@@ -19,7 +19,11 @@ months <- tibble(
     to = as.Date("2025-08-01"),
     by = "month"
   )
-)
+) |>
+  mutate(
+    census_date_minus12 = census_date - months(12),
+    end_census_month = ceiling_date(census_date, "month") - days(1)
+  )
 
 # Filter repeat prescriptions
 repeat_prescription <- med_reviews |>
@@ -30,12 +34,13 @@ repeat_prescription <- med_reviews |>
 # Join with census months
 patients_on_repeat_presc <- left_join(
   repeat_prescription,
-  months |>
-    mutate(
-      census_date_minus12 = census_date - months(12),
-      end_census_month = ceiling_date(census_date, "month") - days(1)
-    ),
-  by = join_by(within(repeat_presc_issue_date, repeat_presc_issue_date, census_date_minus12, end_census_month))
+  months,
+  by = join_by(within(
+    repeat_presc_issue_date,
+    repeat_presc_issue_date,
+    census_date_minus12,
+    end_census_month
+  ))
 ) |>
   select(PatientID, PracticeID, census_date, repeat_presc_issue_date) |>
   distinct(PatientID, PracticeID, census_date, .keep_all = TRUE)
@@ -46,15 +51,27 @@ med_review_bday <- med_reviews |>
   select(PatientID, PracticeID, EventDate, DayOfBirth, MonthOfBirth) |>
   mutate(
     # Birthday in same year as review
-    birthday_this_year = make_date(year = year(EventDate), month = MonthOfBirth, day = DayOfBirth),
+    birthday_this_year = make_date(
+      year = year(EventDate),
+      month = MonthOfBirth,
+      day = DayOfBirth
+    ),
     # Birthday in previous year
-    birthday_last_year = make_date(year = year(EventDate) - 1, month = MonthOfBirth, day = DayOfBirth),
+    birthday_last_year = make_date(
+      year = year(EventDate) - 1,
+      month = MonthOfBirth,
+      day = DayOfBirth
+    ),
     # Use most recent birthday before or on review date
-    BirthDate = if_else(EventDate >= birthday_this_year, birthday_this_year, birthday_last_year),
+    BirthDate = if_else(
+      EventDate >= birthday_this_year,
+      birthday_this_year,
+      birthday_last_year
+    ),
     # Days since birth date
     DaysFromBirth = as.integer(difftime(EventDate, BirthDate, units = "days")),
     # Flags for reviews within 90 and 180 days *after* birth date
-    within_90 = between(DaysFromBirth,0, 90),
+    within_90 = between(DaysFromBirth, 0, 90),
     within_180 = between(DaysFromBirth, 0, 180)
   )
 
