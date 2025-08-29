@@ -3,9 +3,14 @@ library(lubridate)
 library(stringr)
 library(readxl)
 library(writexl)
+library(fs)
 
-# Load data
-med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-05 - LIST - Med Reviews.xlsx")
+dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
+
+# Read in pre-cleaned data
+med_reviews <- read_parquet(
+  path(dir, "data", "working", "med_reviews_clean.parquet")
+)
 
 # Create monthly census dates
 months <- tibble(
@@ -76,10 +81,8 @@ pharma_1_monthly <- final_data |>
   ) |>
   ungroup()
 
-
 # Export to Excel
-write_xlsx(pharma_1_monthly, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Pharma_med_reviews_90_180.xlsx")
-
-
-
-
+write_xlsx(
+  pharma_1_monthly,
+  path = path(dir, "data", "outputs", "Pharma_med_reviews_90_180.xlsx")
+)
