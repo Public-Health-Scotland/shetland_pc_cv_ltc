@@ -33,18 +33,7 @@ med_reviews <- read_xlsx(
     DerivedStaffType = "text",
     DateLeftShetland = "date"
   )
-) |>
-  filter(!is.na(PracticeID)) |>
-  select(
-    PracticeID,
-    EventDate,
-    DerivedEventType,
-    DerivedStaffType
-  ) |>
-  mutate(
-    MonthYear = format(EventDate, "%Y-%m"),
-    QuarterYear = paste0("Q", quarter(EventDate), "-", year(EventDate))
-  )
+)
 
 # Write out cleaned data
 
