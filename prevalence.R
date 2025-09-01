@@ -16,9 +16,7 @@ clean_data <- read_parquet(
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
   filter(str_ends(EventType, "Code")) |>
-  separate_wider_delim(
-    cols = EventType,
-    delim = regex("\\s+?-\\s+?"),
+    delim = regex("\\s+-\\s+"),
     names = c("ltc", "type")
   ) |>
   lazy_dt() |>
