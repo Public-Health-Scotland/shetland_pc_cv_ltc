@@ -11,9 +11,9 @@ output:
 
 # Shetland PCPIP Indicators
 
-These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient level data has been extracted from SHIP, it was then anonymised before being sent securely to PHS.
+These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient-level data has been extracted from SHIP, and it was then anonymised before being sent securely to PHS.
 
-The indicators are a Work In Progress, there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
+The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -51,7 +51,7 @@ source("functions/make_dt.R")
 source("functions/create_subplot_title_annotations.R")
 ```
 
-```{r join_indiactor_data}
+```{r join_indicator_data}
 all_data <- monthly_summary |>
   left_join(
     pharmacist_reviews,
@@ -128,7 +128,7 @@ practice_symbols <- setNames(
 
 ## GP Practice selection
 
-Select one or more GP Practices here; by default, all practices are shown, however viewing 9 practices on a single plot will often look quite chaotic!
+Select one or more GP Practices here; by default, all practices are shown, however, viewing 9 practices on a single plot will often look quite chaotic!
 
 All plots and data tables will be filtered to the selected practice(s).
 
