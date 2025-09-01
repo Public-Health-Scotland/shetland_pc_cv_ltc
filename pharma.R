@@ -67,7 +67,7 @@ date_str <- format(Sys.Date(), "%Y%m%d")
 
 output_path <- path(
   dir, "data", "outputs",
-  paste0("Shetland-PCPIP-indicators-",date_str,".xlsx")
+  paste0("Shetland-PCPIP-indicators-", date_str, ".xlsx")
 )
 
 # Write the output
