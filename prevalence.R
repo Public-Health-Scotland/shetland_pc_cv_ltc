@@ -134,9 +134,8 @@ first_diag_census <- left_join(
   # This assigns each patient to a practice for each month.
   left_join(
     clean_data |>
-      arrange(PatientID, EventDate) |>
-      distinct(PatientID, PracticeID, .keep_all = TRUE),
       select(PatientID, PracticeID, EventDate, JoinedDate, LeftDate) |>
+      arrange(PatientID, EventDate),
     by = join_by(PatientID == PatientID, closest(census_date >= EventDate)),
     multiple = "last", # Use the latest practice joined if 2 events on the same day
     relationship = "many-to-one"
