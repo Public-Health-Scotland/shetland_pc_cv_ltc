@@ -78,7 +78,7 @@ all_data <- monthly_summary |>
   mutate(
     census_date = as.Date(census_date),
     PracticeID = factor(PracticeID),
-    across(where(is.numeric), \(x) replace_na(x, 0L))
+    across(where(is.numeric), \(x) replace_na(x, 0))
     ) 
 
 practice_ids <- unique(sort(all_data[["PracticeID"]]))
