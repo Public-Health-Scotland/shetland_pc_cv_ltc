@@ -157,7 +157,9 @@ first_diag_census <- left_join(
   filter(
     is.na(LeftShetlandDate) |
       census_date <= floor_date(LeftShetlandDate, unit = "month")
-  )
+  ) |>
+  mutate(first_diag_plus15 = FirstDiag + months(15))
+
 
 census_data <- first_diag_census |>
   left_join(
@@ -177,16 +179,24 @@ census_data <- first_diag_census |>
       census_date == census_date
     ),
     multiple = "first"
+  ) |>
+  mutate(
+    PatientID_countable = if_else(
+      first_diag_plus15 < census_date,
+      PatientID,
+      NA
+    )
   )
 
 monthly_summary <- census_data |>
   group_by(census_date, PracticeID) |>
   summarise(
     ltc_prev_count = n_distinct(PatientID),
+    ltc_countable_prev_count = n_distinct(PatientID_countable) - 1,
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    ltc_invite_prop = ltc_invite_count / ltc_prev_count,
-    ltc_attend_prop = ltc_attend_count / ltc_prev_count
+    ltc_invite_prop = ltc_invite_count / ltc_countable_prev_count,
+    ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count
   ) |>
   ungroup() |>
   left_join(
@@ -201,6 +211,7 @@ monthly_summary <- census_data |>
     PracticeID,
     census_date,
     ltc_prev_count,
+    ltc_countable_prev_count,
     list_prev,
     list_pop,
     ltc_invite_prop,
