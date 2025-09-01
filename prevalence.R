@@ -143,7 +143,7 @@ first_diag_census <- left_join(
   ) |>
   arrange(PatientID, EventDate) |>
   fill(PracticeID, .direction = "downup") |>
-  select(-EventDate, -JoinedDate) |>
+  select(-EventDate) |>
   # Exclude resolved conditions
   filter(
     is.na(Resolution) | census_date <= floor_date(Resolution, unit = "month")
