@@ -31,45 +31,48 @@ raw_data <- unzip(zipfile = data_file_path) |>
     )
   )
 
-cleaned_filtered <- raw_data |>
+cleaned_data <- raw_data |>
   # 1899 dates are in a different format so will now be NA
   drop_na(EventDate) |>
   mutate(across(c(EventDate, DateOfDeath), as.Date)) |>
   # One record is 1900-01-01 (obvious outlier) other records are in the future
   # We only need the latest ~4 years
-  filter(between(year(EventDate), 1901, year(today())))
+  filter(between(year(EventDate), 1901, year(today()))) |>
+  arrange(desc(EventDate))
 
 # Adding a columns where EventType = Main Address Off Shetland,Left Practice and Joined Practice with a date
-cleaned_filtered <- cleaned_filtered |>
-  mutate(
-    LeftShetlandDate = if_else(
-      EventType == "Main Address Off Shetland",
-      EventDate,
-      NA
-    )
+left_shetland_dates <- cleaned_data |>
+  filter(EventType == "Main Address Off Shetland") |>
+  select(PatientID, LeftShetlandDate = EventDate) |>
+  distinct(PatientID, .keep_all = TRUE)
+
+left_practice_dates <- cleaned_data |>
+  filter(EventType == "Left Practice") |>
+  select(PatientID, PracticeID, LeftDate = EventDate) |>
+  distinct(PatientID, PracticeID, .keep_all = TRUE)
+
+joined_practice_dates <- cleaned_data |>
+  filter(EventType == "Joined Practice") |>
+  select(PatientID, PracticeID, JoinedDate = EventDate) |>
+  distinct(PatientID, PracticeID, .keep_all = TRUE)
+
+# Join new columns into main data
+cleaned_filtered_data <- cleaned_data |>
+  left_join(
+    left_shetland_dates,
+    by = "PatientID",
+    relationship = "many-to-one"
   ) |>
-  group_by(PatientID) |>
-  mutate(
-    LeftShetlandDate = max(LeftShetlandDate, na.rm = TRUE),
-    LeftShetlandDate = na_if(LeftShetlandDate, as.Date(-Inf))
-  ) |> # clean up when there is no date for LeftShetlandDate
-  ungroup() |>
-  mutate(LeftDate = if_else(EventType == "Left Practice", EventDate, NA)) |>
-  group_by(PatientID, PracticeID) |>
-  mutate(
-    LeftDate = max(LeftDate, na.rm = TRUE),
-    LeftDate = na_if(LeftDate, as.Date(-Inf))
-  ) |> # clean up when there is no date for LeftDate
-  ungroup() |>
-  mutate(
-    JoinedDate = if_else(EventType == "Joined Practice", EventDate, NA)
+  left_join(
+    left_practice_dates,
+    by = c("PatientID", "PracticeID"),
+    relationship = "many-to-one"
   ) |>
-  group_by(PatientID, PracticeID) |>
-  mutate(
-    JoinedDate = max(JoinedDate, na.rm = TRUE),
-    JoinedDate = na_if(JoinedDate, as.Date(-Inf))
-  ) |> # clean up when there is no date for JoinedDate
-  ungroup() |>
+  left_join(
+    joined_practice_dates,
+    by = c("PatientID", "PracticeID"),
+    relationship = "many-to-one"
+  ) |>
   filter(
     EventType != "Main Address Off Shetland",
     EventType != "Left Practice",
@@ -78,7 +81,7 @@ cleaned_filtered <- cleaned_filtered |>
   )
 
 write_parquet(
-  cleaned_filtered,
+  cleaned_filtered_data,
   path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet"), # will need to update every time a new extract
   compression = "zstd"
 )
