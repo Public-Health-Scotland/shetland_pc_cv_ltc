@@ -11,9 +11,9 @@ output:
 
 # Shetland PCPIP Indicators
 
-These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient level data has been extracted from SHIP, it was then anonymised before being sent securely to PHS.
+These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient-level data has been extracted from SHIP, and it was then anonymised before being sent securely to PHS.
 
-The indicators are a Work In Progress, there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may in fact be highlighting coding differences between (or even within) practices.
+The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -51,7 +51,7 @@ source("functions/make_dt.R")
 source("functions/create_subplot_title_annotations.R")
 ```
 
-```{r crosstalk_setup}
+```{r join_indicator_data}
 all_data <- monthly_summary |>
   left_join(
     pharmacist_reviews,
@@ -59,19 +59,33 @@ all_data <- monthly_summary |>
     relationship = "one-to-one"
   ) |>
   left_join(
-    quarterly_event_type,
-    by = join_by(census_date == quarter_start, PracticeID)
+    quarterly_event_type |> 
+      pivot_wider(
+        id_cols = c(PracticeID, quarter_start),
+        names_from = DerivedEventType, 
+        values_from = event_type_proportion, 
+        values_fill = 0.0
+        ),
+    by = join_by(census_date == quarter_start, PracticeID),
+    relationship = "one-to-one"
   ) |>
   left_join(
     pharma_1_monthly,
-    by = join_by(census_date, PracticeID)
+    by = join_by(census_date, PracticeID),
+    relationship = "one-to-one"
   ) |>
   filter(census_date >= as.Date("2022-01-01")) |>
   mutate(
     census_date = as.Date(census_date),
-    PracticeID = factor(PracticeID)
-    )
+    PracticeID = factor(PracticeID),
+    across(where(is.numeric), \(x) replace_na(x, 0))
+    ) 
 
+practice_ids <- unique(sort(all_data[["PracticeID"]]))
+n_practices <- length(practice_ids)
+```
+
+```{r setup_crosstalk}
 # Wrap the data frame in SharedData
 # Use PracticeID as the key for linking
 shared_monthly_summary <- SharedData$new(
@@ -82,9 +96,6 @@ shared_monthly_summary <- SharedData$new(
 ```
 
 ```{r make_plotly_palette}
-practice_ids <- unique(sort(monthly_summary[["PracticeID"]]))
-n_practices <- length(practice_ids)
-
 phs_accessible_colours <- c(
   "#12436D",  # Dark Blue
   "#28A197",  # Turquoise
@@ -117,7 +128,7 @@ practice_symbols <- setNames(
 
 ## GP Practice selection
 
-Select one or more GP Practices here; by default, all practices are shown, however viewing 9 practices on a single plot will often look quite chaotic!
+Select one or more GP Practices here; by default, all practices are shown, however, viewing 9 practices on a single plot will often look quite chaotic!
 
 All plots and data tables will be filtered to the selected practice(s).
 
@@ -366,28 +377,27 @@ nrows <- 3
 
 subplot_title_annotations <- create_subplot_title_annotations(
   num_rows = nrows, # Pass the number of rows for your subplot grid
-  titles_vector = unique(pull(shared_monthly_summary$data(), PracticeID)), # Pass the vector of unique practice IDs
+  titles_vector = practice_ids, # Pass the vector of unique practice IDs
   subplot_margin = subplot_margin_value
 )
 
-event_type_colours <- c("#12436D", "#28A197", "#801650") |>
-  setNames(unique(pull(quarterly_event_type, DerivedEventType)))
+event_type_colours <- setNames(
+  object = c("#12436D", "#28A197", "#801650"), 
+  nm =  unique(pull(quarterly_event_type, DerivedEventType))
+  )
 
-pharm_9_plotly <- shared_monthly_summary$data() |>
+pharm_9_plotly <- quarterly_event_type |>
   group_by(PracticeID) %>%
   group_map(
     \(practice_data, practice_id) {
       practice_id_label <- paste("Practice ", practice_id)
 
-      first_practice_id <- unique(pull(
-        shared_monthly_summary$data(),
-        PracticeID
-        ))[1]
+      first_practice_id <- practice_ids[1]
       is_first_practice <- as.integer(practice_id) == first_practice_id
 
       plot_ly(
         data = practice_data,
-        x = ~census_date,
+        x = ~quarter_start,
         y = ~event_type_proportion,
         color = ~DerivedEventType,
         colors = event_type_colours,
@@ -399,7 +409,7 @@ pharm_9_plotly <- shared_monthly_summary$data() |>
         mode = "lines+markers",
         hoverinfo = "text",
         text = ~ paste(
-          "Quarter start:", census_date,
+          "Quarter start:", quarter_start,
           "<br>Event type:", DerivedEventType,
           "<br>Percentage:", round(event_type_proportion * 100, 1), "%"
         ),
@@ -472,8 +482,7 @@ Note that in this iteration, the below data table includes blank rows for months
 # Create the DT datatable
 pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "event_type_proportion",
-  name = "Review Type Percentage",
+  var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
   keep_cols = "DerivedEventType",
   percentage = TRUE
 )
