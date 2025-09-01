@@ -134,9 +134,9 @@ first_diag_census <- left_join(
   # This assigns each patient to a practice for each month.
   left_join(
     clean_data |>
-      select(PatientID, PracticeID, EventDate, JoinedDate) |>
       arrange(PatientID, EventDate) |>
       distinct(PatientID, PracticeID, .keep_all = TRUE),
+      select(PatientID, PracticeID, EventDate, JoinedDate, LeftDate) |>
     by = join_by(PatientID == PatientID, closest(census_date >= EventDate)),
     multiple = "last", # Use the latest practice joined if 2 events on the same day
     relationship = "many-to-one"
@@ -152,7 +152,9 @@ first_diag_census <- left_join(
   filter(
     is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")
   ) |>
-  # filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
+  filter(
+    is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")
+  ) |>
   filter(
     is.na(LeftShetlandDate) |
       census_date <= floor_date(LeftShetlandDate, unit = "month")
