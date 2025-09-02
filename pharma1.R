@@ -99,7 +99,10 @@ pharma_1_monthly <- final_data |>
   ungroup()
 
 # Export to Excel
+
 write_xlsx(
   pharma_1_monthly,
   path = path(dir, "data", "outputs", "Pharma_med_reviews_90_180.xlsx")
 )
+
+rm(denominator, final_data, med_review_bday, med_reviews, months, repeat_prescription)
