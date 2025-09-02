@@ -2,11 +2,15 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 library(readxl)
-library(ggplot2)
 library(writexl)
+library(fs)
 
-# Load data
-med_reviews <- read_xlsx("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/raw/2025-05 - LIST - Med Reviews.xlsx")
+dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
+
+# Read in pre-cleaned data
+med_reviews <- read_parquet(
+  path(dir, "data", "working", "med_reviews_clean.parquet")
+)
 
 # Create monthly census dates
 months <- tibble(
@@ -15,7 +19,11 @@ months <- tibble(
     to = as.Date("2025-08-01"),
     by = "month"
   )
-)
+) |>
+  mutate(
+    census_date_minus12 = census_date - months(12),
+    end_census_month = ceiling_date(census_date, "month") - days(1)
+  )
 
 # Filter repeat prescriptions
 repeat_prescription <- med_reviews |>
@@ -24,14 +32,15 @@ repeat_prescription <- med_reviews |>
   rename(repeat_presc_issue_date = EventDate)
 
 # Join with census months
-denominator <- left_join(
+patients_on_repeat_presc <- left_join(
   repeat_prescription,
-  months |>
-    mutate(
-      census_date_minus12 = census_date - months(12),
-      end_census_month = ceiling_date(census_date, "month") - days(1)
-    ),
-  by = join_by(within(repeat_presc_issue_date, repeat_presc_issue_date, census_date_minus12, end_census_month))
+  months,
+  by = join_by(within(
+    repeat_presc_issue_date,
+    repeat_presc_issue_date,
+    census_date_minus12,
+    end_census_month
+  ))
 ) |>
   select(PatientID, PracticeID, census_date, repeat_presc_issue_date) |>
   distinct(PatientID, PracticeID, census_date, .keep_all = TRUE)
@@ -42,21 +51,33 @@ med_review_bday <- med_reviews |>
   select(PatientID, PracticeID, EventDate, DayOfBirth, MonthOfBirth) |>
   mutate(
     # Birthday in same year as review
-    birthday_this_year = make_date(year = year(EventDate), month = MonthOfBirth, day = DayOfBirth),
+    birthday_this_year = make_date(
+      year = year(EventDate),
+      month = MonthOfBirth,
+      day = DayOfBirth
+    ),
     # Birthday in previous year
-    birthday_last_year = make_date(year = year(EventDate) - 1, month = MonthOfBirth, day = DayOfBirth),
+    birthday_last_year = make_date(
+      year = year(EventDate) - 1,
+      month = MonthOfBirth,
+      day = DayOfBirth
+    ),
     # Use most recent birthday before or on review date
-    BirthDate = if_else(EventDate >= birthday_this_year, birthday_this_year, birthday_last_year),
+    BirthDate = if_else(
+      EventDate >= birthday_this_year,
+      birthday_this_year,
+      birthday_last_year
+    ),
     # Days since birth date
-    DaysFromBirth = as.numeric(difftime(EventDate, BirthDate, units = "days")),
+    DaysFromBirth = as.integer(difftime(EventDate, BirthDate, units = "days")),
     # Flags for reviews within 90 and 180 days *after* birth date
-    within_90 = DaysFromBirth >= 0 & DaysFromBirth <= 90,
-    within_180 = DaysFromBirth >= 0 & DaysFromBirth <= 180
+    within_90 = between(DaysFromBirth, 0, 90),
+    within_180 = between(DaysFromBirth, 0, 180)
   )
 
 # Join with denominator
 final_data <- left_join(
-  denominator,
+  patients_on_repeat_presc,
   med_review_bday,
   by = join_by(
     PatientID == PatientID,
@@ -77,22 +98,8 @@ pharma_1_monthly <- final_data |>
   ) |>
   ungroup()
 
-# Plot both proportions
-ggplot(pharma_1_monthly, aes(x = census_date)) +
-  geom_line(aes(y = prop_review_180, colour = "180-day")) +
-  geom_line(aes(y = prop_review_90, colour = "90-day")) +
-  facet_wrap(~PracticeID) +
-  labs(
-    title = "Proportion of Medication Reviews within 90 and 180 Days of Birthday",
-    y = "Proportion",
-    colour = "Review Window"
-  ) +
-  theme_minimal()
-
-
 # Export to Excel
-write_xlsx(pharma_1_monthly, path = "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Pharma_med_reviews_90_180.xlsx")
-
-
-
-
+write_xlsx(
+  pharma_1_monthly,
+  path = path(dir, "data", "outputs", "Pharma_med_reviews_90_180.xlsx")
+)
