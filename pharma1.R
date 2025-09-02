@@ -93,7 +93,7 @@ pharma_1_monthly <- final_data |>
     patients_on_repeat_presc = n_distinct(PatientID),
     med_reviews_180 = sum(within_180, na.rm = TRUE),
     med_reviews_90 = sum(within_90, na.rm = TRUE),
-    prop_review_180 = med_reviews_180 / patients_on_repeat_presc,
+    review_180_prop = med_reviews_180 / patients_on_repeat_presc,
     prop_review_90 = med_reviews_90 / patients_on_repeat_presc
   ) |>
   ungroup()

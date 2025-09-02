@@ -554,7 +554,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_180_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~prop_review_180,
+  y = ~review_180_prop,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -562,7 +562,7 @@ pharma1_180_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(prop_review_180, accuracy = 0.1))
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
@@ -577,7 +577,7 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "prop_review_180",
+  var = "review_180_prop",
   name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )
