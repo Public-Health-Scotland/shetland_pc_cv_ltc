@@ -322,6 +322,8 @@ monthly_summary <- census_data |>
     ltc_first_attend_count,
     list_prev,
     list_pop,
+    ltc_invite_count,
+    ltc_attend_count,
     ltc_invite_prop,
     ltc_attend_prop,
     ltc_first_invite_attend_prop,
