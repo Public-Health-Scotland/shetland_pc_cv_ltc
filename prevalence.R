@@ -341,16 +341,6 @@ monthly_shetland_summary_avg <- monthly_summary |>
     ltc_attend_prop_avg = sum(ltc_attend_count)/ltc_countable_prev_total
   ) |>
   ungroup() |>
-  
-  select(
-    census_date,
-    ltc_prev_total,
-    ltc_countable_prev_total,
-    ltc_invite_prop_avg,                    
-    ltc_attend_prop_avg
-    
-  )
-
 
 rm(
   "census_data",
