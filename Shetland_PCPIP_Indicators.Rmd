@@ -14,7 +14,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center', out.width = '100%')
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", out.width = "100%")
 
 # Copy in the PHS style CSS file if required
 if (!file.exists(file.path(getwd(), "phs_style.css"))) {
@@ -57,13 +57,13 @@ all_data <- monthly_summary |>
     relationship = "one-to-one"
   ) |>
   left_join(
-    quarterly_event_type |> 
+    quarterly_event_type |>
       pivot_wider(
         id_cols = c(PracticeID, quarter_start),
-        names_from = DerivedEventType, 
-        values_from = event_type_proportion, 
+        names_from = DerivedEventType,
+        values_from = event_type_proportion,
         values_fill = 0.0
-        ),
+      ),
     by = join_by(census_date == quarter_start, PracticeID),
     relationship = "one-to-one"
   ) |>
@@ -77,7 +77,7 @@ all_data <- monthly_summary |>
     census_date = as.Date(census_date),
     PracticeID = factor(PracticeID, levels = unique(PracticeID)),
     across(where(is.numeric), \(x) replace_na(x, 0))
-    ) 
+  )
 
 practice_ids <- unique(sort(all_data[["PracticeID"]]))
 n_practices <- length(practice_ids)
@@ -344,7 +344,8 @@ cv_ctac_3_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>Invites sent:", ltc_first_invite_count,
-    "<br>Attend percentage:", percent(ltc_first_invite_attend_prop, accuracy = 0.1))
+    "<br>Attend percentage:", percent(ltc_first_invite_attend_prop, accuracy = 0.1)
+  )
 ) |>
   layout(
     title = str_wrap("Monthly CV attendances within 60 days of first invite", 25),
@@ -400,7 +401,8 @@ cv_ctac_4_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>First attendances (in the last 15 months):", ltc_first_attend_count,
-    "<br>HoC sent percentage:", percent(ltc_first_attend_hoc_sent_prop, accuracy = 0.1))
+    "<br>HoC sent percentage:", percent(ltc_first_attend_hoc_sent_prop, accuracy = 0.1)
+  )
 ) |>
   layout(
     title = str_wrap("Monthly HoC letters sent within 30 days of first attendance (last 15 months of attendances)", 25),
@@ -499,9 +501,9 @@ subplot_title_annotations <- create_subplot_title_annotations(
 )
 
 event_type_colours <- setNames(
-  object = c("#12436D", "#28A197", "#801650"), 
-  nm =  unique(pull(quarterly_event_type, DerivedEventType))
-  )
+  object = c("#12436D", "#28A197", "#801650"),
+  nm = unique(pull(quarterly_event_type, DerivedEventType))
+)
 
 pharm_9_plotly <- quarterly_event_type |>
   group_by(PracticeID) %>%
@@ -599,7 +601,7 @@ Note that in this iteration, the below data table includes blank rows for months
 # Create the DT datatable
 pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
+  var = c("Medication Review with Person", "Notes based Medication Review", "Polypharmacy Medication Review"),
   keep_cols = "DerivedEventType",
   percentage = TRUE
 )
@@ -729,3 +731,4 @@ for (sheet_name in names(all_data_frames)) {
 # Save the workbook to the specified path
 file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Indicators_", params$data_date, ".xlsx")
 saveWorkbook(wb, file_path, overwrite = TRUE)
+```
