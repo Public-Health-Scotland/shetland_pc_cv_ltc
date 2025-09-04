@@ -43,7 +43,7 @@ cleaned_data <- raw_data |>
   mutate(
     EventType = case_match(
       EventCode,
-      # Using this fomat means we can find first or all still
+      # Using this format means we can find first or all still
       "9O41." ~ "LTC Admin - (first) LTC Invite",
       "66Z.." ~ "LTC Admin - (first) LTC Attendance",
       .default = EventType
