@@ -33,7 +33,7 @@ monthly_event_type <- med_reviews %>%
       )
   ) |>
   mutate(census_date = floor_date(EventDate, unit = "month")) %>%
-  count(PracticeID, census_date, DerivedEventType, name = "") %>%
+  count(PracticeID, census_date, DerivedEventType, name = "NumberOfEvents") %>%
   group_by(PracticeID, census_date) %>%
   mutate(
     TotalEvents = sum(NumberOfEvents),
