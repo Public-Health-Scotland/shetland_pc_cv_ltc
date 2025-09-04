@@ -207,8 +207,8 @@ cv_prev_plotly <- plot_ly(
 ```{r cv_prev_dt}
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "list_prev",
-  name = "CV prevalence percentage",
+  main_var = "list_prev",
+  main_name = "CV prevalence percentage",
   percentage = TRUE
 )
 ```
@@ -255,8 +255,8 @@ cv_ctac_1_plotly <- plot_ly(
 ```{r cv_ctac_1_dt}
 cv_ctac_1_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_invite_prop",
-  name = "Invite Percentage",
+  main_var = "ltc_invite_prop",
+  main_name = "Invite Percentage",
   percentage = TRUE
 )
 ```
@@ -304,8 +304,8 @@ cv_ctac_2_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_2_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_attend_prop",
-  name = "Attend percentage",
+  main_var = "ltc_attend_prop",
+  main_name = "Attend percentage",
   percentage = TRUE
 )
 ```
@@ -416,8 +416,10 @@ cv_ctac_4_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_4_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_first_attend_hoc_sent_prop",
-  name = "HoC sent percentage",
+  main_var = "ltc_first_attend_hoc_sent_prop",
+  main_name = "HoC sent percentage",
+  other_vars = "ltc_first_attend_count",
+  other_names = "First attendances - last 15m",
   percentage = TRUE
 )
 ```
@@ -467,8 +469,8 @@ pharm_6_plotly <- plot_ly(
 # Create the DT datatable
 pharm_6_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "pharmacist_proportion",
-  name = "Percentage by pharmacist",
+  main_var = "pharmacist_proportion",
+  main_name = "Percentage by pharmacist",
   percentage = TRUE
 )
 ```
@@ -599,7 +601,7 @@ Note that in this iteration, the below data table includes blank rows for months
 # Create the DT datatable
 pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
+  main_var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
   keep_cols = "DerivedEventType",
   percentage = TRUE
 )
@@ -646,8 +648,8 @@ pharma1_90_plotly <- plot_ly(
 ```{r pharma1_90_dt}
 pharma1_90_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "prop_review_90",
-  name = "Proportion Reviewed (90 days)",
+  main_var = "prop_review_90",
+  main_name = "Proportion Reviewed (90 days)",
   percentage = TRUE
 )
 ```
@@ -694,8 +696,8 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "review_180_prop",
-  name = "Proportion Reviewed (180 days)",
+  main_var = "review_180_prop",
+  main_name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )
 ```
