@@ -55,7 +55,7 @@ quarterly_event_type <- monthly_event_type %>%
   mutate(event_type_proportion = NumberOfEvents / TotalEvents)
 
 
-#Shetland averages for pharmacist_reviews,monthly_event_type,quarterly_event_type
+# Shetland averages for pharmacist_reviews, monthly_event_type, quarterly_event_type
 
 monthly_shetland_pharmacist_review_avg <- pharmacist_reviews |>
   group_by(census_date) |>
