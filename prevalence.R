@@ -184,7 +184,10 @@ ltc_attend_census <- inner_join(
 ltc_first_attend_hoc_sent_census <- inner_join(
   ltc_first_attend_hoc_sent,
   months,
-  by = join_by(ltc_first_attend_month == census_date)
+  by = join_by(
+    # Looking at the past 15 months of first attendances
+    between(ltc_first_attend_month, census_date_minus15, census_date)
+  )
 ) |>
   # We only need one record per census date per patient
   select(
@@ -335,10 +338,8 @@ rm(
   "ltc_attend_census",
   "ltc_first_attend",
   "ltc_first_attend_census",
-<<<<<<< HEAD
-=======
   "ltc_hoc_sent",
->>>>>>> 75f8970 (Add CTAC 4 analysis)
+  "ltc_hoc_sent",
   "ltc_first_attend_hoc_sent",
   "ltc_first_attend_hoc_sent_census",
   "ltc_invite",
