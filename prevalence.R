@@ -339,7 +339,6 @@ rm(
   "ltc_first_attend",
   "ltc_first_attend_census",
   "ltc_hoc_sent",
-  "ltc_hoc_sent",
   "ltc_first_attend_hoc_sent",
   "ltc_first_attend_hoc_sent_census",
   "ltc_invite",
