@@ -223,15 +223,17 @@ monthly_summary <- census_data |>
 monthly_shetland_summary_avg <- monthly_summary |>
   group_by(census_date) |>
   summarise(
-    ltc_prev_avg = mean(ltc_prev_count),
-    ltc_invite_prop_avg = mean(ltc_invite_prop),                    
-    ltc_attend_prop_avg = mean(ltc_attend_prop)
+    ltc_prev_total = sum(ltc_prev_count),
+    ltc_countable_prev_total =sum(ltc_countable_prev_count),
+    ltc_invite_prop_avg = sum(ltc_invite_count)/ltc_countable_prev_total,                    
+    ltc_attend_prop_avg = sum(ltc_attend_count)/ltc_countable_prev_total
   ) |>
   ungroup() |>
   
   select(
     census_date,
-    ltc_prev_avg,
+    ltc_prev_total,
+    ltc_countable_prev_total,
     ltc_invite_prop_avg,                    
     ltc_attend_prop_avg
     
