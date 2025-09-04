@@ -240,7 +240,11 @@ cv_ctac_1_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID, 
+    "<br>Month:", census_date,
+    "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Monthly CV invite percentage by GP practice", 25),
@@ -288,7 +292,11 @@ cv_ctac_2_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Monthly CV attend percentage by GP practice", 25),
@@ -360,8 +368,10 @@ cv_ctac_3_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_3_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_first_invite_attend_prop",
-  name = "Attend percentage",
+  main_var = "ltc_first_invite_attend_prop",
+  main_name ="Attend percentage",
+  other_vars = "ltc_first_invite_count",
+  other_names = "Invites sent",
   percentage = TRUE
 )
 ```
@@ -453,7 +463,10 @@ pharm_6_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Monthly percentage of reviews completed by a pharmacist", 25),
@@ -633,7 +646,11 @@ pharma1_90_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (90 days)", 25),
@@ -681,7 +698,10 @@ pharma1_180_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
