@@ -79,7 +79,7 @@ monthly_shetland_event_type_avg <- monthly_event_type |>
   ungroup() 
 
 
-quarterley_shetland_event_type_avg <- quarterly_event_type |>
+quarterly_shetland_event_type_avg <- quarterly_event_type |>
   group_by(quarter_start) |>
   summarise(
     NumberOfEvents_avg = mean(NumberOfEvents),
