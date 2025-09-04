@@ -233,9 +233,10 @@ monthly_summary <- census_data |>
     ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count,
     # NA values mean no invite, so count only those with T/F (i.e. had an invite)
     ltc_first_invite_count = sum(!is.na(attend_within_60)), 
+    ltc_first_invite_attend_count = sum(attend_within_60, na.rm = TRUE),
     ltc_first_invite_attend_prop = if_else(
       ltc_first_invite_count > 0,
-      sum(attend_within_60, na.rm = TRUE) / ltc_first_invite_count,
+      ltc_first_invite_attend_count / ltc_first_invite_count,
       NA_real_
     )
   ) |>
