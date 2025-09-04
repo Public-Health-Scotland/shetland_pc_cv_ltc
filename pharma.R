@@ -60,9 +60,9 @@ quarterly_event_type <- monthly_event_type %>%
 monthly_shetland_pharmacist_review_avg <- pharmacist_reviews |>
   group_by(census_date) |>
   summarise(
-    NumberOfEvents_avg = mean(NumberOfEvents),
-    total_events_avg = mean(total_events),
-    pharmacist_proportion_avg = sum(NumberOfEvents)/sum(total_events)
+    NumberOfEvents_total = sum(NumberOfEvents),
+    total_events_total = sum(total_events),
+    pharmacist_proportion_avg = NumberOfEvents_total / total_events_total 
 
   ) |>
   ungroup() 
