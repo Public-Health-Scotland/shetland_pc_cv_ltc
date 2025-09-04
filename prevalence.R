@@ -85,6 +85,37 @@ ltc_first_invite_attend <- left_join(
     .groups = "drop"
   )
 
+ltc_first_attend <- clean_data |>
+  filter(str_ends(EventType, fixed("(first) LTC Attendance"))) |>
+  select(PatientID, PracticeID, EventDate) |>
+  rename(ltc_first_attend_date = EventDate) |>
+  mutate(ltc_first_attend_month = floor_date(ltc_first_attend_date, "month"))
+
+ltc_hoc_sent <- clean_data |>
+  filter(str_ends(EventType, fixed("HoC Letter"))) |>
+  select(PatientID, PracticeID, EventDate) |>
+  rename(hoc_sent_date = EventDate)
+
+ltc_first_attend_hoc_sent <- left_join(
+  ltc_first_attend,
+  ltc_hoc_sent,
+  by = join_by(
+    PatientID,
+    PracticeID,
+    closest(ltc_first_attend_date <= hoc_sent_date)
+  )
+) |>
+  mutate(
+    hoc_sent_within_30 = !is.na(hoc_sent_date) &
+      ((hoc_sent_date - ltc_first_attend_date) < 30)
+  ) |>
+  # Keep only one invite per patient per month
+  group_by(PatientID, PracticeID, ltc_first_attend_month) |>
+  summarise(
+    hoc_sent_within_30 = any(hoc_sent_within_30),
+    .groups = "drop"
+  )
+
 # Read in population estimates for Shetland
 shetland_pops <- read_parquet(path(
   dir,
@@ -148,6 +179,20 @@ ltc_attend_census <- inner_join(
 ) |>
   # We only need one record per census date per patient
   select(PatientID, PracticeID, census_date, ltc_attend_date) |>
+  distinct(.keep_all = TRUE)
+
+ltc_first_attend_hoc_sent_census <- inner_join(
+  ltc_first_attend_hoc_sent,
+  months,
+  by = join_by(ltc_first_attend_month == census_date)
+) |>
+  # We only need one record per census date per patient
+  select(
+    PatientID,
+    PracticeID,
+    census_date = ltc_first_attend_month,
+    hoc_sent_within_30
+  ) |>
   distinct(.keep_all = TRUE)
 
 first_diag_census <- inner_join(
@@ -214,6 +259,15 @@ census_data <- first_diag_census |>
     ),
     multiple = "first"
   ) |>
+  left_join(
+    ltc_first_attend_hoc_sent_census,
+    by = join_by(
+      PatientID == PatientID,
+      PracticeID == PracticeID,
+      census_date == census_date
+    ),
+    multiple = "first"
+  ) |>
   mutate(
     PatientID_countable = if_else(
       first_diag_plus15 < census_date,
@@ -232,11 +286,18 @@ monthly_summary <- census_data |>
     ltc_invite_prop = ltc_invite_count / ltc_countable_prev_count,
     ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count,
     # NA values mean no invite, so count only those with T/F (i.e. had an invite)
-    ltc_first_invite_count = sum(!is.na(attend_within_60)), 
+    ltc_first_invite_count = sum(!is.na(attend_within_60)),
     ltc_first_invite_attend_count = sum(attend_within_60, na.rm = TRUE),
     ltc_first_invite_attend_prop = if_else(
       ltc_first_invite_count > 0,
       ltc_first_invite_attend_count / ltc_first_invite_count,
+      NA_real_
+    ),
+    ltc_first_attend_count = sum(!is.na(hoc_sent_within_30)),
+    ltc_first_attend_hoc_sent_count = sum(attend_within_60, na.rm = TRUE),
+    ltc_first_attend_hoc_sent_prop = if_else(
+      ltc_first_attend_count > 0,
+      ltc_first_attend_hoc_sent_count / ltc_first_attend_count,
       NA_real_
     )
   ) |>
@@ -255,11 +316,13 @@ monthly_summary <- census_data |>
     ltc_prev_count,
     ltc_countable_prev_count,
     ltc_first_invite_count,
+    ltc_first_attend_count,
     list_prev,
     list_pop,
     ltc_invite_prop,
     ltc_attend_prop,
-    ltc_first_invite_attend_prop
+    ltc_first_invite_attend_prop,
+    ltc_first_attend_hoc_sent_prop
   )
 
 rm(
@@ -270,11 +333,15 @@ rm(
   "first_diag_census",
   "ltc_attend",
   "ltc_attend_census",
+  "ltc_first_attend",
+  "ltc_first_attend_census",
+  "ltc_first_attend_hoc_sent",
+  "ltc_first_attend_hoc_sent_census",
   "ltc_invite",
-  "ltc_first_invite",
-  "ltc_first_invite_attend",
   "ltc_invite_census",
   "ltc_invite_attend_census",
+  "ltc_first_invite",
+  "ltc_first_invite_attend",
   "ltc_first_invite_attend_census",
   "months",
   "shetland_list_sizes",
