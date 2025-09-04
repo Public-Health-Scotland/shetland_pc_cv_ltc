@@ -2,12 +2,17 @@
 title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
+params:
+  data_date: "May 2025"
 output:
   html_document:
     css: phs_style.css
     toc: true
     toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
 ---
+
 
 # Shetland PCPIP Indicators
 
@@ -15,8 +20,10 @@ These indicators have been produced by LIST (the Local Intelligence Support Team
 
 The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
 
+This report is based on data up to the end of `r params$data_date`.
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center', out.width = '100%')
 
 # Copy in the PHS style CSS file if required
 if (!file.exists(file.path(getwd(), "phs_style.css"))) {
@@ -31,6 +38,7 @@ library(scales)
 library(plotly)
 library(DT)
 library(phsstyles)
+library(openxlsx)
 ```
 
 ```{r get_prev_data, include=FALSE}
@@ -40,7 +48,6 @@ source("prevalence.R")
 ```{r get_pharma_data, include=FALSE}
 source("pharma.R")
 ```
-
 
 ```{r get_pharma_1_data, include=FALSE}
 source("pharma1.R")
@@ -608,7 +615,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_180_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~prop_review_180,
+  y = ~review_180_prop,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -616,7 +623,7 @@ pharma1_180_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(prop_review_180, accuracy = 0.1))
+  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
@@ -631,7 +638,7 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "prop_review_180",
+  var = "review_180_prop",
   name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )
@@ -643,3 +650,26 @@ pharma1_180_plotly
 pharma1_180_dt
 ```
 
+```{r export-all-data-frames, message=FALSE, warning=FALSE}
+# Create the named list of data frames and their sheet names
+all_data_frames <- list(
+  monthly_event_type = monthly_event_type,
+  monthly_summary = monthly_summary,
+  pharma_1_monthly = pharma_1_monthly,
+  pharmacist_reviews = pharmacist_reviews,
+  quarterly_event_type = quarterly_event_type
+)
+
+# Create a new workbook
+wb <- createWorkbook()
+
+# Add each data frame as a sheet and set column widths to auto
+for (sheet_name in names(all_data_frames)) {
+  addWorksheet(wb, sheet_name)
+  writeData(wb, sheet_name, all_data_frames[[sheet_name]])
+  setColWidths(wb, sheet = sheet_name, cols = 1:ncol(all_data_frames[[sheet_name]]), widths = "auto")
+}
+
+# Save the workbook to the specified path
+file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Indicators_", params$data_date, ".xlsx")
+saveWorkbook(wb, file_path, overwrite = TRUE)

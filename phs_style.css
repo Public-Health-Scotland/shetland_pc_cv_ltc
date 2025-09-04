@@ -1,291 +1,326 @@
 /* Define colours */
-  :root{
-      --white: #FFFFFF;
-      --black: #000000;
-      --light-grey: #DDDDDD;
-      --darkblue: #004785;
-      --phs-purple: #3F3685;
-      --phs-magenta: #9B4393;
-      --phs-blue: #0078D4;
-      --phs-green: #83BB26;
-      --phs-graphite: #948DA3;
-      --phs-teal: #1E7F84;
-      --phs-liberty: #6B5C85;
-      --phs-rust: #C73918;
-      --phs-purple-80: #655E9D;
-      --phs-purple-50: #9F9BC2;
-      --phs-purple-30: #C5C3DA;
-      --phs-purple-10: #ECEBF3;
-      --phs-magenta-80: #AF69A9;
-      --phs-magenta-50: #CDA1C9;
-      --phs-magenta-30: #E1C7DF;
-      --phs-magenta-10: #F5ECF4;
-      --phs-blue-80: #3393DD;
-      --phs-blue-50: #80BCEA;
-      --phs-blue-30: #B3D7F2;
-      --phs-blue-10: #E6F2FB;
-      --phs-green-80: #9CC951;
-      --phs-green-50: #C1DD93;
-      --phs-green-30: #DAEBBE;
-      --phs-green-10: #F3F8E9;
-      --phs-graphite-80: #A9A4B5;
-      --phs-graphite-50: #CAC6D1;
-      --phs-graphite-30: #DFDDE3;
-      --phs-graphite-10: #F4F4F6;
-      --phs-teal-80: #4B999D;
-      --phs-teal-50: #8FBFC2;
-      --phs-teal-30: #BCD9DA;
-      --phs-teal-10: #E9F2F3;
-      --phs-liberty-80: #897D9D;
-      --phs-liberty-50: #B5AEC2;
-      --phs-liberty-30: #D3CEDA;
-      --phs-liberty-10: #F0EFF3;
-      --phs-rust-80: #D26146;
-      --phs-rust-50: #E39C8C;
-      --phs-rust-30: #EEC4BA;
-      --phs-rust-10: #F9EBE8;
-  }
-
-/* Setting header colour */
-h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
-    color: var(--phs-purple);
-  }
-
-/* Body styles */
-body {
-    font-family: Arial;
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--black);
-    background-color: var(--white);
-  }
-
-/* Style external links */
-.externallink {
-  color: var(--phs-purple);
-  font-weight: bold;
+ :root {
+     --white: #FFFFFF;
+     --black: #000000;
+     --light-grey: #DDDDDD;
+     --darkblue: #004785;
+     --phs-purple: #3F3685;
+     --phs-magenta: #9B4393;
+     --phs-blue: #0078D4;
+     --phs-green: #83BB26;
+     --phs-graphite: #948DA3;
+     --phs-teal: #1E7F84;
+     --phs-liberty: #6B5C85;
+     --phs-rust: #C73918;
+     --phs-purple-80: #655E9D;
+     --phs-purple-50: #9F9BC2;
+     --phs-purple-30: #C5C3DA;
+     --phs-purple-10: #ECEBF3;
+     --phs-magenta-80: #AF69A9;
+     --phs-magenta-50: #CDA1C9;
+     --phs-magenta-30: #E1C7DF;
+     --phs-magenta-10: #F5ECF4;
+     --phs-blue-80: #3393DD;
+     --phs-blue-50: #80BCEA;
+     --phs-blue-30: #B3D7F2;
+     --phs-blue-10: #E6F2FB;
+     --phs-green-80: #9CC951;
+     --phs-green-50: #C1DD93;
+     --phs-green-30: #DAEBBE;
+     --phs-green-10: #F3F8E9;
+     --phs-graphite-80: #A9A4B5;
+     --phs-graphite-50: #CAC6D1;
+     --phs-graphite-30: #DFDDE3;
+     --phs-graphite-10: #F4F4F6;
+     --phs-teal-80: #4B999D;
+     --phs-teal-50: #8FBFC2;
+     --phs-teal-30: #BCD9DA;
+     --phs-teal-10: #E9F2F3;
+     --phs-liberty-80: #897D9D;
+     --phs-liberty-50: #B5AEC2;
+     --phs-liberty-30: #D3CEDA;
+     --phs-liberty-10: #F0EFF3;
+     --phs-rust-80: #D26146;
+     --phs-rust-50: #E39C8C;
+     --phs-rust-30: #EEC4BA;
+     --phs-rust-10: #F9EBE8;
 }
-.externallink:hover {
-  color: var(--phs-teal-50);
-
+/* Setting header colour */
+ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+     color: var(--phs-purple);
+}
+/* Body styles */
+ body {
+     font-family: Arial;
+     font-size: 16px;
+     line-height: 1.5;
+     color: var(--black);
+     background-color: var(--white);
+}
+/* Style external links */
+ .externallink {
+     color: var(--phs-purple);
+     font-weight: bold;
+}
+ .externallink:hover {
+     color: var(--phs-teal-50);
 }
 /* Style in-line hyperlinks (e.g., rmarkdowns using [text](link)) */
-a {
-  color: var(--phs-purple);
-  font-weight: bold;}
-a:hover {
-  color: var(--phs-teal-50);
+ a {
+     color: var(--phs-purple);
+     font-weight: bold;
 }
-
+ a:hover {
+     color: var(--phs-teal-50);
+}
 /* Table of Contents */
-.tocify {
-    width: 20%;
-    max-height: 90%;
-    overflow: auto;
-    margin-left: 2%;
-    position: fixed;
-    border: 4px solid var(--phs-purple);
-    border-radius: 15px;
+/* Make Table of Contents responsive */
+ .tocify {
+     width: 20%;
+     max-height: 90%;
+     overflow: auto;
+     margin-left: 2%;
+     position: fixed;
+     border: 4px solid var(--phs-purple);
+     border-radius: 15px;
 }
-
-.tocify .tocify-item a, .tocify .list-group-item {
-    padding: 4px;
+/* Adjust TOC for smaller screens */
+ @media (max-width: 768px) {
+     .tocify {
+         position: static;
+         width: 100%;
+         margin-left: 0;
+         margin-bottom: 20px;
+    }
 }
-
 /* Table of Contents List Items */
-.list-group-item.active, .list-group-item.active:focus,
-  .list-group-item.active:hover {
-    z-index: 2;
-    color: var(--white);
-    background-color: var(--phs-purple-50);
-    border-color: var(--darkblue);
+ .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+     z-index: 2;
+     color: var(--white);
+     background-color: var(--phs-purple-50);
+     border-color: var(--darkblue);
 }
-
 /* Button styles */
-
 /* Regular button styles */
-.btn{
-  background-color: var(--phs-purple);
-  color: var(--white);
-  background-image:none;
-  border: 2px solid var(--white);
-  border-radius: 10px;
+ .btn {
+     background-color: var(--phs-purple);
+     color: var(--white);
+     background-image: none;
+     border: 2px solid var(--white);
+     border-radius: 10px;
 }
-
 /* Hover/active/focus, change text colour purple, background light purple*/
-.btn-default.active, .btn-default:active, .open>.dropdown-toggle.btn-default,
-  .btn-default.hover, .btn-default:hover, .btn-default.focus,
-  .btn-default:focus {
-    background-color: var(--phs-purple-10);
-    border-color: var(--phs-purple);
+ .btn-default.active, .btn-default:active, .open>.dropdown-toggle.btn-default, .btn-default.hover, .btn-default:hover, .btn-default.focus, .btn-default:focus {
+     background-color: var(--phs-purple-10);
+     border-color: var(--phs-purple);
 }
-
 /* tabset panel update, pills style in phs colours */
-.nav-pills>li>a {
-    border-radius: 4px;
-    color: var(--phs-purple);
-    font-size: 20px;
+ .nav-pills>li>a {
+     border-radius: 4px;
+     color: var(--phs-purple);
+     font-size: 20px;
 }
-
 /* When a tab is active/focus/hover, white text purple background*/
-.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
-    color: var(--white);
-    background-color: var(--phs-purple);
+ .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+     color: var(--white);
+     background-color: var(--phs-purple);
 }
-
 /* Navtabs - the tab styles for tabset panels (default) */
-.nav-tabs {
-    float: left;
-    margin-bottom: -1px;
-    color: var(--phs-purple);
-    background-color: var(--phs-purple-10);
-    font-size: 20px;
+ .nav-tabs {
+     float: left;
+     margin-bottom: -1px;
+     color: var(--phs-purple);
+     background-color: var(--phs-purple-10);
+     font-size: 20px;
 }
-
 /* Specific styles for the hyperlink within a tab */
-.nav-tabs>li>a {
-    margin-right: 2px;
-    line-height: 1.42857143;
-    border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
-    color: var(--phs-purple);
+ .nav-tabs>li>a {
+     margin-right: 2px;
+     line-height: 1.42857143;
+     border: 1px solid transparent;
+     border-radius: 4px 4px 0 0;
+     color: var(--phs-purple);
 }
-
 /* When the tab is either focused or active (selected) */
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-    color: var(--phs-purple);
-    cursor: default;
-    background-color: var(--white);
-    border: 1px solid var(--light-grey);
-    border-bottom-color: transparent;
-    font-weight: bold;
+ .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+     color: var(--phs-purple);
+     cursor: default;
+     background-color: var(--white);
+     border: 1px solid var(--light-grey);
+     border-bottom-color: transparent;
+     font-weight: bold;
 }
-
 /* When the tab is being hovered over */
 /* Mostly adds an underline to be clear content can be clicked */
-.nav-tabs>li>a:hover {
-    text-decoration: underline;
-    color: var(--phs-purple);
-    cursor: default;
-    border-bottom-color: transparent;
+ .nav-tabs>li>a:hover {
+     text-decoration: underline;
+     color: var(--phs-purple);
+     cursor: default;
+     border-bottom-color: transparent;
 }
 
-.display {
-  font-family: Arial, sans-serif; /* Sets the font for the entire table */
-  font-size: 16px; /* Sets the font size for the entire table */
-  color: var(--black); /* Sets the text colour for the entire table */
-  background-color: var(--white); /* Sets the background colour for the entire table */
-  border-collapse: collapse; /* Collapses the borders between table cells */
-  width: 100%; /* Makes the table 100% wide */
-  margin-top: 20px; /* Adds space above the table */
+ .display {
+     font-family: Arial, sans-serif;
+    /* Sets the font for the entire table */
+     font-size: 16px;
+    /* Sets the font size for the entire table */
+     color: var(--black);
+    /* Sets the text colour for the entire table */
+     background-color: var(--white);
+    /* Sets the background colour for the entire table */
+     border-collapse: collapse;
+    /* Collapses the borders between table cells */
+     width: 100%;
+    /* Makes the table 100% wide */
+     margin-top: 20px;
+    /* Adds space above the table */
+     overflow-x: auto;
+     -webkit-overflow-scrolling: touch;
+    /* Ensure tables are responsive */
 }
-
-.display thead th {
-  background-color: var(--phs-purple); /* Sets the background colour for the table header */
-  color: var(--white); /* Sets the text colour for the table header */
-  padding: 12px; /* Adds padding inside the header cells */
-  text-align: left; /* Aligns the header text to the left */
-  border-bottom: 2px solid var(--phs-purple-80); /* Adds a border below the header */
+ .display thead th {
+     background-color: var(--phs-purple);
+    /* Sets the background colour for the table header */
+     color: var(--white);
+    /* Sets the text colour for the table header */
+     padding: 12px;
+    /* Adds padding inside the header cells */
+     text-align: left;
+    /* Aligns the header text to the left */
+     border-bottom: 2px solid var(--phs-purple-80);
+    /* Adds a border below the header */
 }
-
-.display tbody tr:nth-child(odd) {
-  background-color: var(--phs-purple-10); /* Sets the background colour for odd rows */
+ .display tbody tr:nth-child(odd) {
+     background-color: var(--phs-purple-10);
+    /* Sets the background colour for odd rows */
 }
-
-.display tbody tr:nth-child(even) {
-  background-color: var(--white); /* Sets the background colour for even rows */
+ .display tbody tr:nth-child(even) {
+     background-color: var(--white);
+    /* Sets the background colour for even rows */
 }
-
-.display tbody td {
-  padding: 12px; /* Adds padding inside the table data cells */
-  border-bottom: 1px solid var(--phs-purple-30); /* Adds a border below each data row */
+ .display tbody td {
+     padding: 12px;
+    /* Adds padding inside the table data cells */
+     border-bottom: 1px solid var(--phs-purple-30);
+    /* Adds a border below each data row */
 }
-
-.display tbody tr:hover {
-  background-color: var(--phs-purple-30); /* Changes background colour on hover */
+ .display tbody tr:hover {
+     background-color: var(--phs-purple-30);
+    /* Changes background colour on hover */
 }
-
-.display tfoot th {
-  background-color: var(--phs-purple); /* Sets the background colour for the table footer */
-  color: var(--white); /* Sets the text colour for the table footer */
-  padding: 12px; /* Adds padding inside the footer cells */
-  text-align: left; /* Aligns the footer text to the left */
-  border-top: 2px solid var(--phs-purple-80); /* Adds a border above the footer */
+ .display tfoot th {
+     background-color: var(--phs-purple);
+    /* Sets the background colour for the table footer */
+     color: var(--white);
+    /* Sets the text colour for the table footer */
+     padding: 12px;
+    /* Adds padding inside the footer cells */
+     text-align: left;
+    /* Aligns the footer text to the left */
+     border-top: 2px solid var(--phs-purple-80);
+    /* Adds a border above the footer */
 }
-
-.dataTables_wrapper .dataTables_filter input {
-    border: 1px solid var(--phs-purple-50);  /* Border for the search input */
-    border-radius: 5px;          /* Rounded corners for the search input */
-    padding: 5px;              /* Padding inside the search input */
-    background-color: var(--white);  /* Background color for the search input */
-    color: var(--black);      /* Text color for the search input */
+ .dataTables_wrapper .dataTables_filter input {
+     border: 1px solid var(--phs-purple-50);
+    /* Border for the search input */
+     border-radius: 5px;
+    /* Rounded corners for the search input */
+     padding: 5px;
+    /* Padding inside the search input */
+     background-color: var(--white);
+    /* Background color for the search input */
+     color: var(--black);
+    /* Text color for the search input */
 }
-
-.dataTables_wrapper .dataTables_filter input:focus {
-    outline: none;            /* Removes the default focus outline */
-    border-color: var(--phs-blue);    /* Changes border color on focus */
-    box-shadow: 0 0 5px var(--phs-blue-30);  /* Adds a shadow on focus */
+ .dataTables_wrapper .dataTables_filter input:focus {
+     outline: none;
+    /* Removes the default focus outline */
+     border-color: var(--phs-blue);
+    /* Changes border color on focus */
+     box-shadow: 0 0 5px var(--phs-blue-30);
+    /* Adds a shadow on focus */
 }
-
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 5px 10px;           /* Padding for pagination buttons */
-    margin: 0 3px;             /* Margin for pagination buttons */
-    border: 1px solid var(--phs-purple-50);  /* Border for pagination buttons */
-    border-radius: 5px;          /* Rounded corners for pagination buttons */
-    background-color: var(--white);  /* Background color for pagination buttons */
-    color: var(--black);      /* Text color for pagination buttons */
-    cursor: pointer;          /* Cursor style for pagination buttons */
+ .dataTables_wrapper .dataTables_paginate .paginate_button {
+     padding: 5px 10px;
+    /* Padding for pagination buttons */
+     margin: 0 3px;
+    /* Margin for pagination buttons */
+     border: 1px solid var(--phs-purple-50);
+    /* Border for pagination buttons */
+     border-radius: 5px;
+    /* Rounded corners for pagination buttons */
+     background-color: var(--white);
+    /* Background color for pagination buttons */
+     color: var(--black);
+    /* Text color for pagination buttons */
+     cursor: pointer;
+    /* Cursor style for pagination buttons */
 }
-
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background-color: var(--phs-purple-10);  /* Background color on hover */
-    color: var(--black);          /* Text color on hover */
+ .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+     background-color: var(--phs-purple-10);
+    /* Background color on hover */
+     color: var(--black);
+    /* Text color on hover */
 }
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: var(--phs-purple-30);  /* Background color for the current page */
-    color: var(--black);          /* Text color for the current page */
-    border-color: var(--phs-purple);  /* Border color for the current page */
+ .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+     background-color: var(--phs-purple-30);
+    /* Background color for the current page */
+     color: var(--black);
+    /* Text color for the current page */
+     border-color: var(--phs-purple);
+    /* Border color for the current page */
 }
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-    color: var(--phs-graphite-50);    /* Text color for disabled buttons */
-    background-color: var(--phs-graphite-10);  /* Background color for disabled buttons */
-    border-color: var(--phs-graphite-50);  /* Border color for disabled buttons */
-    cursor: not-allowed;        /* Cursor style for disabled buttons */
+ .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+     color: var(--phs-graphite-50);
+    /* Text color for disabled buttons */
+     background-color: var(--phs-graphite-10);
+    /* Background color for disabled buttons */
+     border-color: var(--phs-graphite-50);
+    /* Border color for disabled buttons */
+     cursor: not-allowed;
+    /* Cursor style for disabled buttons */
 }
-
-.dataTables_wrapper .dataTables_length select {
-  border: 1px solid var(--phs-purple-50);
-  border-radius: 5px;
-  padding: 5px;
-  background-color: var(--white);
-  color: var(--black);
+ .dataTables_wrapper .dataTables_length select {
+     border: 1px solid var(--phs-purple-50);
+     border-radius: 5px;
+     padding: 5px;
+     background-color: var(--white);
+     color: var(--black);
 }
-
-.dataTables_wrapper .dataTables_length select:focus {
-  outline: none;
-  border-color: var(--phs-blue);
-  box-shadow: 0 0 5px var(--phs-blue-30);
+ .dataTables_wrapper .dataTables_length select:focus {
+     outline: none;
+     border-color: var(--phs-blue);
+     box-shadow: 0 0 5px var(--phs-blue-30);
 }
-
-.dataTables_info {
-  color: var(--black);
+ .dataTables_info {
+     color: var(--black);
 }
-
-.dataTables_wrapper .dataTables_processing {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 200px;
-  height: 50px;
-  margin-left: -100px;
-  margin-top: -25px;
-  padding: 10px 0;
-  border: 1px solid var(--phs-purple-50);
-  border-radius: 5px;
-  background-color: var(--white);
-  color: var(--black);
-  text-align: center;
-  z-index: 10;
+ .dataTables_wrapper .dataTables_processing {
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     width: 200px;
+     height: 50px;
+     margin-left: -100px;
+     margin-top: -25px;
+     padding: 10px 0;
+     border: 1px solid var(--phs-purple-50);
+     border-radius: 5px;
+     background-color: var(--white);
+     color: var(--black);
+     text-align: center;
+     z-index: 10;
+}
+/* Add explicit focus styles for interactive elements */
+ a:focus, .btn:focus, .nav-tabs>li>a:focus {
+     outline: 3px solid var(--phs-blue);
+     outline-offset: 2px;
+}
+/* Ensure focus is visible even when using mouse */
+ :focus:not(:focus-visible) {
+     outline: none;
+}
+ :focus-visible {
+     outline: 3px solid var(--phs-blue);
+     outline-offset: 2px;
 }
