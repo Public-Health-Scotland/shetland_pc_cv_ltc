@@ -598,7 +598,6 @@ pharma1_180_dt
 ```{r export-all-data-frames, message=FALSE, warning=FALSE}
 # Create the named list of data frames and their sheet names
 all_data_frames <- list(
-  all_data = all_data,
   monthly_event_type = monthly_event_type,
   monthly_summary = monthly_summary,
   pharma_1_monthly = pharma_1_monthly,
