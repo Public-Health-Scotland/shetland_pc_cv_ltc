@@ -1,7 +1,7 @@
 make_dt <- function(
   shared_data,
   var,
-  name,
+  name = var,
   keep_cols = NULL,
   percentage = FALSE
 ) {

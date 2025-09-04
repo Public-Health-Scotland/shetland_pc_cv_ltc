@@ -5,22 +5,46 @@ library(lubridate)
 library(nanoparquet)
 library(fs)
 library(readr)
+library(dtplyr)
 
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 clean_data <- read_parquet(
-  path(dir, "data", "working", "may_25_clean_data.parquet")
+  path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet")
 )
 
 # Find the first diagnosis date (any condition) for each patient
 first_diag <- clean_data |>
-  filter(str_starts(EventType, "Record of Diagnosis")) |>
+  filter(str_ends(EventType, "Code")) |>
+  separate_wider_delim(
+    cols = EventType,
+    delim = regex("\\s+-\\s+"),
+    names = c("ltc", "type")
+  ) |>
+  lazy_dt() |>
+  group_by(PatientID, ltc) |>
+  mutate(
+    FirstDiag = na_if(
+      min(EventDate[type == "Diagnosis Code"], na.rm = TRUE),
+      as.Date(Inf)
+    ),
+    Resolution = na_if(
+      max(EventDate[type == "Resolved Code"], na.rm = TRUE),
+      as.Date(-Inf)
+    )
+  ) |>
+  drop_na(FirstDiag) |>
   group_by(PatientID) |>
   summarise(
-    FirstDiag = min(EventDate),
+    FirstDiag = min(FirstDiag),
+    Resolution = max(Resolution),
     DateOfDeath = first(DateOfDeath),
-    LeftShetlandDate = first(LeftShetlandDate),
-  )
+    LeftShetlandDate = first(LeftShetlandDate)
+  ) |>
+  ungroup() |>
+  collect() |>
+  # Clear resolved codes that happen before diagnosis
+  mutate(Resolution = if_else(Resolution < FirstDiag, NA_Date_, Resolution))
 
 # LTC Invite
 ltc_invite <- clean_data |>
@@ -110,25 +134,32 @@ first_diag_census <- left_join(
   # This assigns each patient to a practice for each month.
   left_join(
     clean_data |>
-      select(PatientID, PracticeID, EventDate, JoinedDate) |>
-      arrange(PatientID, EventDate) |>
-      distinct(PatientID, PracticeID, .keep_all = TRUE),
+      select(PatientID, PracticeID, EventDate, JoinedDate, LeftDate) |>
+      arrange(PatientID, EventDate),
     by = join_by(PatientID == PatientID, closest(census_date >= EventDate)),
     multiple = "last", # Use the latest practice joined if 2 events on the same day
     relationship = "many-to-one"
   ) |>
   arrange(PatientID, EventDate) |>
   fill(PracticeID, .direction = "downup") |>
-  select(-EventDate, -JoinedDate) |>
+  select(-EventDate) |>
+  # Exclude resolved conditions
+  filter(
+    is.na(Resolution) | census_date <= floor_date(Resolution, unit = "month")
+  ) |>
   # Exclude records after death
   filter(
     is.na(DateOfDeath) | census_date <= floor_date(DateOfDeath, unit = "month")
   ) |>
-  # filter(is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")) |>
+  filter(
+    is.na(LeftDate) | census_date <= floor_date(LeftDate, unit = "month")
+  ) |>
   filter(
     is.na(LeftShetlandDate) |
       census_date <= floor_date(LeftShetlandDate, unit = "month")
-  )
+  ) |>
+  mutate(first_diag_plus15 = FirstDiag + months(15))
+
 
 census_data <- first_diag_census |>
   left_join(
@@ -148,16 +179,24 @@ census_data <- first_diag_census |>
       census_date == census_date
     ),
     multiple = "first"
+  ) |>
+  mutate(
+    PatientID_countable = if_else(
+      first_diag_plus15 < census_date,
+      PatientID,
+      NA
+    )
   )
 
 monthly_summary <- census_data |>
   group_by(census_date, PracticeID) |>
   summarise(
     ltc_prev_count = n_distinct(PatientID),
+    ltc_countable_prev_count = n_distinct(PatientID_countable) - 1,
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    ltc_invite_prop = ltc_invite_count / ltc_prev_count,
-    ltc_attend_prop = ltc_attend_count / ltc_prev_count
+    ltc_invite_prop = ltc_invite_count / ltc_countable_prev_count,
+    ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count
   ) |>
   ungroup() |>
   left_join(
@@ -172,6 +211,7 @@ monthly_summary <- census_data |>
     PracticeID,
     census_date,
     ltc_prev_count,
+    ltc_countable_prev_count,
     list_prev,
     list_pop,
     ltc_invite_prop,
