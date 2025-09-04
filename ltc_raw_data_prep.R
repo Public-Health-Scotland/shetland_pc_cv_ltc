@@ -39,11 +39,14 @@ cleaned_data <- raw_data |>
   # We only need the latest ~4 years
   filter(between(year(EventDate), 1901, year(today()))) |>
   arrange(desc(EventDate)) |>
+  # Use EventCode to highlight some specific other event types
   mutate(
-    EventType = if_else(
-      EventCode == "9O41.",
-      "LTC Admin - (first) LTC Invite",
-      EventType
+    EventType = case_match(
+      EventCode,
+      # Using this fomat means we can find first or all still
+      "9O41." ~ "LTC Admin - (first) LTC Invite",
+      "66Z.." ~ "LTC Admin - (first) LTC Attendance",
+      .default = EventType
     )
   ) |>
   select(-EventCode)
