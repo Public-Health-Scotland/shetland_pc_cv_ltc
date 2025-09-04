@@ -74,17 +74,16 @@ shetland_list_sizes <- read_parquet(
 months <- tibble(
   census_date = seq.Date(
     from = as.Date("2020-01-01"),
-    to = as.Date("2025-06-01"), # latest date available
+    to = as.Date("2025-07-01"), # latest date available
     by = "month"
   ),
   census_date_minus15 = census_date - months(15)
 )
 
-ltc_invite_census <- left_join(
+ltc_invite_census <- inner_join(
   ltc_invite,
   months,
-  by = join_by(within(
-    ltc_invite_date,
+  by = join_by(between(
     ltc_invite_date,
     census_date_minus15,
     census_date
@@ -111,11 +110,10 @@ ltc_invite_attend_census <- left_join(
 ) |>
   select(PatientID, PracticeID, census_date, ltc_invite_date, ltc_attend_date)
 
-ltc_attend_census <- left_join(
+ltc_attend_census <- inner_join(
   ltc_attend,
   months,
-  by = join_by(within(
-    ltc_attend_date,
+  by = join_by(between(
     ltc_attend_date,
     census_date_minus15,
     census_date
@@ -125,7 +123,7 @@ ltc_attend_census <- left_join(
   select(PatientID, PracticeID, census_date, ltc_attend_date) |>
   distinct(.keep_all = TRUE)
 
-first_diag_census <- left_join(
+first_diag_census <- inner_join(
   first_diag,
   months,
   # Join on condition that FirstDiag is before or on census_date

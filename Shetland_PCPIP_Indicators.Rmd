@@ -9,6 +9,8 @@ output:
     css: phs_style.css
     toc: true
     toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
 ---
 
 
@@ -21,7 +23,7 @@ The indicators are a Work In Progress; there may be issues with the indicator de
 This report is based on data up to the end of `r params$data_date`.
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center', out.width = '100%')
 
 # Copy in the PHS style CSS file if required
 if (!file.exists(file.path(getwd(), "phs_style.css"))) {
@@ -46,7 +48,6 @@ source("prevalence.R")
 ```{r get_pharma_data, include=FALSE}
 source("pharma.R")
 ```
-
 
 ```{r get_pharma_1_data, include=FALSE}
 source("pharma1.R")
