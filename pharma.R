@@ -62,7 +62,7 @@ monthly_shetland_pharmacist_review_avg <- pharmacist_reviews |>
   summarise(
     NumberOfEvents_avg = mean(NumberOfEvents),
     total_events_avg = mean(total_events),
-    pharmacist_proportion_avg = sum(NumberOfEvents)/total_events
+    pharmacist_proportion_avg = sum(NumberOfEvents)/sum(total_events)
 
   ) |>
   ungroup() 
