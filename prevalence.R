@@ -178,6 +178,26 @@ monthly_summary <- census_data |>
     ltc_attend_prop
   )
 
+
+#Shetland averages for first diagnosis, invites and attends
+monthly_shetland_summary_avg <- monthly_summary |>
+  group_by(census_date) |>
+  summarise(
+    ltc_prev_avg = mean(ltc_prev_count),
+    ltc_invite_prop_avg = mean(ltc_invite_prop),                    
+    ltc_attend_prop_avg = mean(ltc_attend_prop)
+  ) |>
+  ungroup() |>
+  
+  select(
+    census_date,
+    ltc_prev_avg,
+    ltc_invite_prop_avg,                    
+    ltc_attend_prop_avg
+    
+  )
+
+
 rm(
   "census_data",
   "clean_data",
