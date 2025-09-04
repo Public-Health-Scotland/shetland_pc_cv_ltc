@@ -2,6 +2,8 @@
 title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
+params:
+  data_date: "May 2025"
 output:
   html_document:
     css: phs_style.css
@@ -9,11 +11,14 @@ output:
     toc_float: true
 ---
 
+
 # Shetland PCPIP Indicators
 
 These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient-level data has been extracted from SHIP, and it was then anonymised before being sent securely to PHS.
 
 The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
+
+This report is based on data up to the end of `r params$data_date`.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -611,5 +616,5 @@ for (sheet_name in names(all_data_frames)) {
 }
 
 # Save the workbook to the specified path
-file_path <- "/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Indicators.xlsx"
+file_path <- paste0("/conf/LIST_analytics/Shetland/Primary Care/LTC/data/outputs/Indicators_", params$data_date, ".xlsx")
 saveWorkbook(wb, file_path, overwrite = TRUE)
