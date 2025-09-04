@@ -83,8 +83,7 @@ months <- tibble(
 ltc_invite_census <- inner_join(
   ltc_invite,
   months,
-  by = join_by(within(
-    ltc_invite_date,
+  by = join_by(between(
     ltc_invite_date,
     census_date_minus15,
     census_date
@@ -114,8 +113,7 @@ ltc_invite_attend_census <- left_join(
 ltc_attend_census <- inner_join(
   ltc_attend,
   months,
-  by = join_by(within(
-    ltc_attend_date,
+  by = join_by(between(
     ltc_attend_date,
     census_date_minus15,
     census_date
