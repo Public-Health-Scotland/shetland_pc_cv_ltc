@@ -8,7 +8,7 @@ dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 # Read in pre-cleaned data
 med_reviews <- read_parquet(
-  path(dir, "data", "working", "med_reviews_clean.parquet")
+  path(dir, "data", "working", "july_25_pharmacotherapy.parquet")
 )
 
 # Summarise events by staff type and month, filter for Pharmacist
@@ -103,7 +103,9 @@ output_list <- list(
 date_str <- format(Sys.Date(), "%Y%m%d")
 
 output_path <- path(
-  dir, "data", "outputs",
+  dir,
+  "data",
+  "outputs",
   paste0("Shetland-PCPIP-indicators-", date_str, ".xlsx")
 )
 

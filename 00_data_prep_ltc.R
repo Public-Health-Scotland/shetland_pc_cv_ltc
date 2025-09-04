@@ -17,7 +17,7 @@ data_file_name <- "2025-07 - LIST - CV LTC with ltc resolved events.zip"
 # File path
 data_file_path <- path(dir, "data", "raw", data_file_name)
 
-raw_data <- unzip(zipfile = data_file_path)[1] |>
+raw_data <- unzip(zipfile = data_file_path, exdir = tempdir())[1] |>
   read_xlsx(
     col_types = c(
       PatientID = "numeric",
@@ -39,11 +39,14 @@ cleaned_data <- raw_data |>
   # We only need the latest ~4 years
   filter(between(year(EventDate), 1901, year(today()))) |>
   arrange(desc(EventDate)) |>
+  # Use EventCode to highlight some specific other event types
   mutate(
-    EventType = if_else(
-      EventCode == "9O41.",
-      "LTC Admin - (first) LTC Invite",
-      EventType
+    EventType = case_match(
+      EventCode,
+      # Using this format means we can find first or all still
+      "9O41." ~ "LTC Admin - (first) LTC Invite",
+      "66Z.." ~ "LTC Admin - (first) LTC Attendance",
+      .default = EventType
     )
   ) |>
   select(-EventCode)
@@ -90,7 +93,7 @@ cleaned_filtered_data <- cleaned_data |>
 
 write_parquet(
   cleaned_filtered_data,
-  path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet"), # will need to update every time a new extract
+  path(dir, "data", "working", "july_25_clean_data_w_resolved.parquet"), # will need to update every time a new extract
   compression = "zstd"
 )
 
