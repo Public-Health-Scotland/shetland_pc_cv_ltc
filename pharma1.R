@@ -9,7 +9,7 @@ dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 # Read in pre-cleaned data
 med_reviews <- read_parquet(
-  path(dir, "data", "working", "med_reviews_clean.parquet")
+  path(dir, "data", "working", "june_25_pharmacotherapy.parquet")
 )
 
 # Create monthly census dates
@@ -105,4 +105,11 @@ write_xlsx(
   path = path(dir, "data", "outputs", "Pharma_med_reviews_90_180.xlsx")
 )
 
-rm(denominator, final_data, med_review_bday, med_reviews, months, repeat_prescription)
+rm(
+  denominator,
+  final_data,
+  med_review_bday,
+  med_reviews,
+  months,
+  repeat_prescription
+)
