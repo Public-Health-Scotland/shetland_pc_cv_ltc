@@ -322,11 +322,25 @@ monthly_summary <- census_data |>
     ltc_first_attend_count,
     list_prev,
     list_pop,
+    ltc_invite_count,
+    ltc_attend_count,
     ltc_invite_prop,
     ltc_attend_prop,
     ltc_first_invite_attend_prop,
     ltc_first_attend_hoc_sent_prop
   )
+
+
+#Shetland averages for first diagnosis, invites and attends
+monthly_shetland_summary_avg <- monthly_summary |>
+  group_by(census_date) |>
+  summarise(
+    ltc_prev_total = sum(ltc_prev_count),
+    ltc_countable_prev_total =sum(ltc_countable_prev_count),
+    ltc_invite_prop_avg = sum(ltc_invite_count)/ltc_countable_prev_total,                    
+    ltc_attend_prop_avg = sum(ltc_attend_count)/ltc_countable_prev_total
+  ) |>
+  ungroup()
 
 rm(
   "census_data",

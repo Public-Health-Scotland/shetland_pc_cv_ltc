@@ -54,6 +54,43 @@ quarterly_event_type <- monthly_event_type %>%
   ungroup() %>%
   mutate(event_type_proportion = NumberOfEvents / TotalEvents)
 
+
+# Shetland averages for pharmacist_reviews, monthly_event_type, quarterly_event_type
+
+monthly_shetland_pharmacist_review_avg <- pharmacist_reviews |>
+  group_by(census_date) |>
+  summarise(
+    NumberOfEvents_total = sum(NumberOfEvents),
+    total_events_total = sum(total_events),
+    pharmacist_proportion_avg = NumberOfEvents_total / total_events_total 
+
+  ) |>
+  ungroup() 
+
+
+monthly_shetland_event_type_avg <- monthly_event_type |>
+  group_by(census_date) |>
+  summarise(
+    NumberOfEvents_total = sum(NumberOfEvents),
+    TotalEvents_total = sum(TotalEvents),
+    event_type_proportion_avg = NumberOfEvents_total / TotalEvents_total
+
+  ) |>
+  ungroup() 
+
+
+quarterly_shetland_event_type_avg <- quarterly_event_type |>
+  group_by(quarter_start) |>
+  summarise(
+    NumberOfEvents_total = sum(NumberOfEvents),
+    TotalEvents_total = sum(TotalEvents),
+    event_type_proportion_avg = NumberOfEvents_total / TotalEvents_total
+    
+  ) |>
+  ungroup() 
+
+
+
 # Create a named list of data frames for export
 output_list <- list(
   "Pharmacist Percentages" = pharmacist_reviews,
