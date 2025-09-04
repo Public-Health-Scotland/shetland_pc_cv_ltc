@@ -17,7 +17,7 @@ data_file_name <- "2025-07 - LIST - CV LTC with ltc resolved events.zip"
 # File path
 data_file_path <- path(dir, "data", "raw", data_file_name)
 
-raw_data <- unzip(zipfile = data_file_path)[1] |>
+raw_data <- unzip(zipfile = data_file_path, exdir = tempdir())[1] |>
   read_xlsx(
     col_types = c(
       PatientID = "numeric",
