@@ -3,7 +3,7 @@ title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
 params:
-  data_date: "May 2025"
+  data_date: "June 2025"
 output:
   html_document:
     css: phs_style.css
@@ -12,15 +12,6 @@ output:
     toc_collapsed: true
     toc_depth: 3
 ---
-
-
-# Shetland PCPIP Indicators
-
-These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient-level data has been extracted from SHIP, and it was then anonymised before being sent securely to PHS.
-
-The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
-
-This report is based on data up to the end of `r params$data_date`.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center', out.width = '100%')
@@ -133,6 +124,14 @@ practice_symbols <- setNames(
 )
 ```
 
+# Shetland PCPIP Indicators
+
+These indicators have been produced by LIST (the Local Intelligence Support Team), in collaboration with NHS Shetland. Patient-level data has been extracted from SHIP, and it was then anonymised before being sent securely to PHS.
+
+The indicators are a Work In Progress; there may be issues with the indicator definition or with the analysis methodology. We will work to improve them, iterating on feedback received. Other apparent issues with the indicators may, in fact, be highlighting coding differences between (or even within) practices.
+
+This report is based on data up to the end of `r params$data_date`.
+
 ## GP Practice selection
 
 Select one or more GP Practices here; by default, all practices are shown, however, viewing 9 practices on a single plot will often look quite chaotic!
@@ -208,8 +207,8 @@ cv_prev_plotly <- plot_ly(
 ```{r cv_prev_dt}
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "list_prev",
-  name = "CV prevalence percentage",
+  main_var = "list_prev",
+  main_name = "CV prevalence percentage",
   percentage = TRUE
 )
 ```
@@ -241,7 +240,11 @@ cv_ctac_1_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID, 
+    "<br>Month:", census_date,
+    "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Monthly CV invite percentage by GP practice", 25),
@@ -256,8 +259,8 @@ cv_ctac_1_plotly <- plot_ly(
 ```{r cv_ctac_1_dt}
 cv_ctac_1_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_invite_prop",
-  name = "Invite Percentage",
+  main_var = "ltc_invite_prop",
+  main_name = "Invite Percentage",
   percentage = TRUE
 )
 ```
@@ -289,7 +292,11 @@ cv_ctac_2_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Monthly CV attend percentage by GP practice", 25),
@@ -305,8 +312,8 @@ cv_ctac_2_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_2_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_attend_prop",
-  name = "Attend percentage",
+  main_var = "ltc_attend_prop",
+  main_name = "Attend percentage",
   percentage = TRUE
 )
 ```
@@ -361,8 +368,10 @@ cv_ctac_3_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_3_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_first_invite_attend_prop",
-  name = "Attend percentage",
+  main_var = "ltc_first_invite_attend_prop",
+  main_name ="Attend percentage",
+  other_vars = "ltc_first_invite_count",
+  other_names = "Invites sent",
   percentage = TRUE
 )
 ```
@@ -417,8 +426,10 @@ cv_ctac_4_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_4_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "ltc_first_attend_hoc_sent_prop",
-  name = "HoC sent percentage",
+  main_var = "ltc_first_attend_hoc_sent_prop",
+  main_name = "HoC sent percentage",
+  other_vars = "ltc_first_attend_count",
+  other_names = "First attendances - last 15m",
   percentage = TRUE
 )
 ```
@@ -452,7 +463,10 @@ pharm_6_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Monthly percentage of reviews completed by a pharmacist", 25),
@@ -468,8 +482,8 @@ pharm_6_plotly <- plot_ly(
 # Create the DT datatable
 pharm_6_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "pharmacist_proportion",
-  name = "Percentage by pharmacist",
+  main_var = "pharmacist_proportion",
+  main_name = "Percentage by pharmacist",
   percentage = TRUE
 )
 ```
@@ -600,7 +614,7 @@ Note that in this iteration, the below data table includes blank rows for months
 # Create the DT datatable
 pharm_9_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
+  main_var = c("Medication Review with Person",  "Notes based Medication Review", "Polypharmacy Medication Review"),
   keep_cols = "DerivedEventType",
   percentage = TRUE
 )
@@ -632,7 +646,11 @@ pharma1_90_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1)
+    )
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (90 days)", 25),
@@ -647,8 +665,8 @@ pharma1_90_plotly <- plot_ly(
 ```{r pharma1_90_dt}
 pharma1_90_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "prop_review_90",
-  name = "Proportion Reviewed (90 days)",
+  main_var = "prop_review_90",
+  main_name = "Proportion Reviewed (90 days)",
   percentage = TRUE
 )
 ```
@@ -680,7 +698,10 @@ pharma1_180_plotly <- plot_ly(
   type = "scatter",
   mode = "lines+markers",
   hoverinfo = "text",
-  text = ~ paste("Practice:", PracticeID, "<br>Month:", census_date, "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
@@ -695,8 +716,8 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  var = "review_180_prop",
-  name = "Proportion Reviewed (180 days)",
+  main_var = "review_180_prop",
+  main_name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )
 ```
