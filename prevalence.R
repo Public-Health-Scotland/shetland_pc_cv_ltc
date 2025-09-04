@@ -76,7 +76,7 @@ ltc_first_invite_attend <- left_join(
     # NA means no attendance. If they have an attendance, was it within 60 days?
     # NA gives FALSE, also > 60 days gives FALSE.
     attend_within_60 = !is.na(ltc_attend_date) &
-      (ltc_attend_date <= ltc_first_invite_date + days(60))
+      (ltc_attend_date <= (ltc_first_invite_date + days(60)))
   ) |>
   # Keep only one invite per patient per month
   group_by(PatientID, PracticeID, ltc_first_invite_month) |>
