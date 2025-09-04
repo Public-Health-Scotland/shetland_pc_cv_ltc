@@ -24,7 +24,7 @@ raw_data <- unzip(zipfile = data_file_path)[1] |>
       PracticeID = "numeric",
       DayOfBirth = "skip",
       MonthOfBirth = "skip",
-      EventCode = "skip",
+      EventCode = "text",
       EventDate = "date",
       DateOfDeath = "date",
       EventType = "text"
@@ -38,7 +38,15 @@ cleaned_data <- raw_data |>
   # One record is 1900-01-01 (obvious outlier) other records are in the future
   # We only need the latest ~4 years
   filter(between(year(EventDate), 1901, year(today()))) |>
-  arrange(desc(EventDate))
+  arrange(desc(EventDate)) |>
+  mutate(
+    EventType = if_else(
+      EventCode == "9O41.",
+      "LTC Admin - (first) LTC Invite",
+      EventType
+    )
+  ) |>
+  select(-EventCode)
 
 # Adding a columns where EventType = Main Address Off Shetland,Left Practice and Joined Practice with a date
 left_shetland_dates <- cleaned_data |>

@@ -317,6 +317,61 @@ cv_ctac_2_plotly
 cv_ctac_2_dt
 ```
 
+### Cardiovascular disease first appointment attendances
+
+This indicator is defined as *'% of people with a CV LTC who attended their first appointment within 60 days of being invited'*. Specifically:
+
+NUMERATOR: Count of people with LTCs who have attended an appointment within 60 days of the invite.
+
+DENOMINATOR: Count of people with CV LTC who have been invited to a first appointment this month.
+
+Note that this indicator does not use the 15-month 'grace period' from diagnosis, as it is based on patients being sent an invite within the given month. 
+
+```{r cv_ctac_3_plotly}
+# It uses the shared data, so it will update based on the filter
+cv_ctac_3_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~ltc_first_invite_attend_prop,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  connectgaps = TRUE,
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>Invites sent:", ltc_first_invite_count,
+    "<br>Attend percentage:", percent(ltc_first_invite_attend_prop, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Monthly CV attendances within 60 days of first invite", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r cv_ctac_3_dt}
+# Create the DT datatable
+cv_ctac_3_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "ltc_first_invite_attend_prop",
+  name = "Attend percentage",
+  percentage = TRUE
+)
+```
+
+```{r display_cv_ctac_3_elements}
+# Display the plot and table
+cv_ctac_3_plotly
+cv_ctac_3_dt
+```
 ## Pharmacotherapy
 
 ### Reviews by a pharmacist
