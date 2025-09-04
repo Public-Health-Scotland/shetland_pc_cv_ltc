@@ -33,7 +33,7 @@ monthly_event_type <- med_reviews %>%
       )
   ) |>
   mutate(census_date = floor_date(EventDate, unit = "month")) %>%
-  count(PracticeID, census_date, DerivedEventType, name = "NumberOfEvents") %>%
+  count(PracticeID, census_date, DerivedEventType, name = "") %>%
   group_by(PracticeID, census_date) %>%
   mutate(
     TotalEvents = sum(NumberOfEvents),
@@ -53,6 +53,43 @@ quarterly_event_type <- monthly_event_type %>%
   ) %>%
   ungroup() %>%
   mutate(event_type_proportion = NumberOfEvents / TotalEvents)
+
+
+#Shetland averages for pharmacist_reviews,monthly_event_type,quarterly_event_type
+
+monthly_shetland_pharmacist_review_avg <- pharmacist_reviews |>
+  group_by(census_date) |>
+  summarise(
+    NumberOfEvents_avg = mean(NumberOfEvents),
+    total_events_avg = mean(total_events),
+    pharmacist_proportion_avg = sum(NumberOfEvents)/total_events
+
+  ) |>
+  ungroup() 
+
+
+monthly_shetland_event_type_avg <- monthly_event_type |>
+  group_by(census_date) |>
+  summarise(
+    NumberOfEvents_avg = mean(NumberOfEvents),
+    TotalEvents_avg = mean(TotalEvents),
+    event_type_proportion_avg = sum(NumberOfEvents)/TotalEvents
+
+  ) |>
+  ungroup() 
+
+
+quarterley_shetland_event_type_avg <- quarterly_event_type |>
+  group_by(quarter_start) |>
+  summarise(
+    NumberOfEvents_avg = mean(NumberOfEvents),
+    TotalEvents_avg = mean(TotalEvents),
+    event_type_proportion_avg = sum(NumberOfEvents)/TotalEvents
+    
+  ) |>
+  ungroup() 
+
+
 
 # Create a named list of data frames for export
 output_list <- list(
