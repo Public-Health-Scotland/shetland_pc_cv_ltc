@@ -294,7 +294,7 @@ monthly_summary <- census_data |>
       NA_real_
     ),
     ltc_first_attend_count = sum(!is.na(hoc_sent_within_30)),
-    ltc_first_attend_hoc_sent_count = sum(attend_within_60, na.rm = TRUE),
+    ltc_first_attend_hoc_sent_count = sum(hoc_sent_within_30, na.rm = TRUE),
     ltc_first_attend_hoc_sent_prop = if_else(
       ltc_first_attend_count > 0,
       ltc_first_attend_hoc_sent_count / ltc_first_attend_count,
@@ -335,6 +335,10 @@ rm(
   "ltc_attend_census",
   "ltc_first_attend",
   "ltc_first_attend_census",
+<<<<<<< HEAD
+=======
+  "ltc_hoc_sent",
+>>>>>>> 75f8970 (Add CTAC 4 analysis)
   "ltc_first_attend_hoc_sent",
   "ltc_first_attend_hoc_sent_census",
   "ltc_invite",
