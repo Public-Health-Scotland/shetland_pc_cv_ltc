@@ -10,7 +10,7 @@ library(dtplyr)
 dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 clean_data <- read_parquet(
-  path(dir, "data", "working", "june_25_clean_data_w_resolved.parquet")
+  path(dir, "data", "working", "july_25_clean_data_w_resolved.parquet")
 )
 
 # Find the first diagnosis date (any condition) for each patient
