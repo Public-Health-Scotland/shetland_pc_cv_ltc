@@ -340,7 +340,7 @@ monthly_shetland_summary_avg <- monthly_summary |>
     ltc_invite_prop_avg = sum(ltc_invite_count)/ltc_countable_prev_total,                    
     ltc_attend_prop_avg = sum(ltc_attend_count)/ltc_countable_prev_total
   ) |>
-  ungroup() |>
+  ungroup()
 
 rm(
   "census_data",
