@@ -372,6 +372,63 @@ cv_ctac_3_dt <- make_dt(
 cv_ctac_3_plotly
 cv_ctac_3_dt
 ```
+
+### Cardiovascular disease House of Care letter after first attendance
+
+This indicator is defined as *'% of people with a CV LTC who attended a first  appointment who have a House of Care letter sent out to them'*. Specifically:
+
+NUMERATOR: Count of people with CV LTC who attended first appointment who have had House of Care letter sent out within 30 days after attendance (41C1)
+
+DENOMINATOR: Number of people with LTCs attending a first appointment in last 15 months.
+
+Note that this indicator does not use the 15-month 'grace period' from diagnosis, as it is based on patients attending an appointment. 
+
+```{r cv_ctac_4_plotly}
+# It uses the shared data, so it will update based on the filter
+cv_ctac_4_plotly <- plot_ly(
+  shared_monthly_summary,
+  x = ~census_date,
+  y = ~ltc_first_attend_hoc_sent_prop,
+  color = ~PracticeID,
+  symbol = ~PracticeID,
+  colors = practice_colours,
+  symbols = practice_symbols,
+  type = "scatter",
+  mode = "lines+markers",
+  hoverinfo = "text",
+  connectgaps = TRUE,
+  text = ~ paste(
+    "Practice:", PracticeID,
+    "<br>Month:", census_date,
+    "<br>First attendances (in the last 15 months):", ltc_first_attend_count,
+    "<br>HoC sent percentage:", percent(ltc_first_attend_hoc_sent_prop, accuracy = 0.1))
+) |>
+  layout(
+    title = str_wrap("Monthly HoC letters sent within 30 days of first attendance (last 15 months of attendances)", 25),
+    xaxis = list(title = "Month"),
+    yaxis = list(
+      title = "Percentage",
+      tickformat = ".1%"
+    )
+  )
+```
+
+```{r cv_ctac_4_dt}
+# Create the DT datatable
+cv_ctac_4_dt <- make_dt(
+  shared_data = shared_monthly_summary,
+  var = "ltc_first_attend_hoc_sent_prop",
+  name = "HoC sent percentage",
+  percentage = TRUE
+)
+```
+
+```{r display_cv_ctac_4_elements}
+# Display the plot and table
+cv_ctac_4_plotly
+cv_ctac_4_dt
+```
+
 ## Pharmacotherapy
 
 ### Reviews by a pharmacist
