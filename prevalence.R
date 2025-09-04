@@ -73,7 +73,8 @@ ltc_first_invite_attend <- left_join(
 ) |>
   mutate(
     ltc_first_invite_month = floor_date(ltc_first_invite_date, "month"),
-    # NA means no attendance, if they have an attendance was it within 60 days?
+    # NA means no attendance. If they have an attendance, was it within 60 days?
+    # NA gives FALSE, also > 60 days gives FALSE.
     attend_within_60 = !is.na(ltc_attend_date) &
       (ltc_attend_date <= ltc_first_invite_date + days(60))
   ) |>
@@ -232,7 +233,8 @@ monthly_summary <- census_data |>
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
     ltc_invite_prop = ltc_invite_count / ltc_countable_prev_count,
     ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count,
-    ltc_first_invite_count = sum(!is.na(attend_within_60)),
+    # NA values mean no invite, so count only those with T/F (i.e. had an invite)
+    ltc_first_invite_count = sum(!is.na(attend_within_60)), 
     ltc_first_invite_attend_prop = if_else(
       ltc_first_invite_count > 0,
       sum(attend_within_60, na.rm = TRUE) / ltc_first_invite_count,
