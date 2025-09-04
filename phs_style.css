@@ -93,11 +93,6 @@
          margin-bottom: 20px;
     }
 }
-/* Ensure tables are responsive */
- .display {
-     overflow-x: auto;
-     -webkit-overflow-scrolling: touch;
-}
 /* Table of Contents List Items */
  .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
      z-index: 2;
@@ -163,6 +158,7 @@
      cursor: default;
      border-bottom-color: transparent;
 }
+
  .display {
      font-family: Arial, sans-serif;
     /* Sets the font for the entire table */
@@ -178,6 +174,9 @@
     /* Makes the table 100% wide */
      margin-top: 20px;
     /* Adds space above the table */
+     overflow-x: auto;
+     -webkit-overflow-scrolling: touch;
+    /* Ensure tables are responsive */
 }
  .display thead th {
      background-color: var(--phs-purple);
