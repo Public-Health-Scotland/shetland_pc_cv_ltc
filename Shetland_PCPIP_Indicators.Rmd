@@ -3,7 +3,7 @@ title: "Shetland PCPIP Indicators"
 author: "LIST (Local Intelligence Support Team) - Public Health Scotland"
 date: "Updated: `r format(Sys.Date(), '%d %B %Y')`"
 params:
-  data_date: "June 2025"
+  data_date: "July 2025"
 output:
   html_document:
     css: phs_style.css

@@ -8,7 +8,7 @@ dir <- path("/conf/LIST_analytics/Shetland/Primary Care/LTC")
 
 # Read in pre-cleaned data
 med_reviews <- read_parquet(
-  path(dir, "data", "working", "june_25_pharmacotherapy.parquet")
+  path(dir, "data", "working", "july_25_pharmacotherapy.parquet")
 )
 
 # Summarise events by staff type and month, filter for Pharmacist

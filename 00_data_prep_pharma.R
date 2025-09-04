@@ -58,7 +58,7 @@ raw_data <- unzip(zipfile = data_file_path, exdir = tempdir())[1] |>
 # Write out cleaned data
 write_parquet(
   raw_data,
-  path(dir, "data", "working", "june_25_pharmacotherapy.parquet"),
+  path(dir, "data", "working", "july_25_pharmacotherapy.parquet"),
   compression = "zstd"
 )
 
