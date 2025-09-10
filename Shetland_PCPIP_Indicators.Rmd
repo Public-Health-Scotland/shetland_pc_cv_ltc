@@ -232,7 +232,7 @@ DENOMINATOR: Count of people with CV LTCs.
 cv_ctac_1_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_invite_prop,
+  y = ~proportion_LTC_invite,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -243,7 +243,7 @@ cv_ctac_1_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID, 
     "<br>Month:", census_date,
-    "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1)
+    "<br>Invite percentage:", percent(proportion_LTC_invite, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -259,7 +259,7 @@ cv_ctac_1_plotly <- plot_ly(
 ```{r cv_ctac_1_dt}
 cv_ctac_1_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_invite_prop",
+  main_var = "proportion_LTC_invite",
   main_name = "Invite Percentage",
   percentage = TRUE
 )
@@ -284,7 +284,7 @@ DENOMINATOR: Count of people with CV LTCs.
 cv_ctac_2_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_attend_prop,
+  y = ~proportion_LTC_attend,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -295,7 +295,7 @@ cv_ctac_2_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1)
+    "<br>Attend percentage:", percent(proportion_LTC_attend, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -312,7 +312,7 @@ cv_ctac_2_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_2_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_attend_prop",
+  main_var = "proportion_LTC_attend",
   main_name = "Attend percentage",
   percentage = TRUE
 )
@@ -339,7 +339,7 @@ Note that this indicator does not use the 15-month 'grace period' from diagnosis
 cv_ctac_3_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_first_invite_attend_prop,
+  y = ~proportion_first_invite_LTC_attend,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -352,7 +352,7 @@ cv_ctac_3_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>Invites sent:", ltc_first_invite_count,
-    "<br>Attend percentage:", percent(ltc_first_invite_attend_prop, accuracy = 0.1)
+    "<br>Attend percentage:", percent(proportion_first_invite_LTC_attend, accuracy = 0.1)
   )
 ) |>
   layout(
@@ -369,7 +369,7 @@ cv_ctac_3_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_3_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_first_invite_attend_prop",
+  main_var = "proportion_first_invite_LTC_attend",
   main_name ="Attend percentage",
   other_vars = "ltc_first_invite_count",
   other_names = "Invites sent",
@@ -398,7 +398,7 @@ Note that this indicator does not use the 15-month 'grace period' from diagnosis
 cv_ctac_4_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_first_attend_hoc_sent_prop,
+  y = ~proportion_first_attend_HOC_sent,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -411,7 +411,7 @@ cv_ctac_4_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>First attendances (in the last 15 months):", ltc_first_attend_count,
-    "<br>HoC sent percentage:", percent(ltc_first_attend_hoc_sent_prop, accuracy = 0.1)
+    "<br>HoC sent percentage:", percent(proportion_first_attend_HOC_sent, accuracy = 0.1)
   )
 ) |>
   layout(
@@ -428,7 +428,7 @@ cv_ctac_4_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_4_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_first_attend_hoc_sent_prop",
+  main_var = "proportion_first_attend_HOC_sent",
   main_name = "HoC sent percentage",
   other_vars = "ltc_first_attend_count",
   other_names = "First attendances - last 15m",
@@ -640,7 +640,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_90_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~prop_review_90,
+  y = ~proportion_pharma_review_90,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -651,7 +651,7 @@ pharma1_90_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1)
+    "<br>Proportion Reviewed (90 days):", percent(proportion_pharma_review_90, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -667,7 +667,7 @@ pharma1_90_plotly <- plot_ly(
 ```{r pharma1_90_dt}
 pharma1_90_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "prop_review_90",
+  main_var = "proportion_pharma_review_90",
   main_name = "Proportion Reviewed (90 days)",
   percentage = TRUE
 )
@@ -692,7 +692,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_180_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~review_180_prop,
+  y = ~proportion_pharma_review_180,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -703,7 +703,7 @@ pharma1_180_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
+    "<br>Proportion Reviewed (180 days):", percent(proportion_pharma_review_180, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
@@ -718,7 +718,7 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "review_180_prop",
+  main_var = "proportion_pharma_review_180",
   main_name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )

@@ -286,19 +286,19 @@ monthly_summary <- census_data |>
     ltc_countable_prev_count = n_distinct(PatientID_countable) - 1,
     ltc_invite_count = sum(!is.na(ltc_invite_date)),
     ltc_attend_count = sum(!is.na(ltc_attend_date)),
-    ltc_invite_prop = ltc_invite_count / ltc_countable_prev_count,
-    ltc_attend_prop = ltc_attend_count / ltc_countable_prev_count,
+    proportion_LTC_invite = ltc_invite_count / ltc_countable_prev_count,
+    proportion_LTC_attend = ltc_attend_count / ltc_countable_prev_count,
     # NA values mean no invite, so count only those with T/F (i.e. had an invite)
     ltc_first_invite_count = sum(!is.na(attend_within_60)),
     ltc_first_invite_attend_count = sum(attend_within_60, na.rm = TRUE),
-    ltc_first_invite_attend_prop = if_else(
+    proportion_first_invite_LTC_attend = if_else(
       ltc_first_invite_count > 0,
       ltc_first_invite_attend_count / ltc_first_invite_count,
       NA_real_
     ),
     ltc_first_attend_count = sum(!is.na(hoc_sent_within_30)),
     ltc_first_attend_hoc_sent_count = sum(hoc_sent_within_30, na.rm = TRUE),
-    ltc_first_attend_hoc_sent_prop = if_else(
+    proportion_first_attend_HOC_sent = if_else(
       ltc_first_attend_count > 0,
       ltc_first_attend_hoc_sent_count / ltc_first_attend_count,
       NA_real_
@@ -322,10 +322,10 @@ monthly_summary <- census_data |>
     ltc_first_attend_count,
     list_prev,
     list_pop,
-    ltc_invite_prop,
-    ltc_attend_prop,
-    ltc_first_invite_attend_prop,
-    ltc_first_attend_hoc_sent_prop
+    proportion_LTC_invite,
+    proportion_LTC_attend,
+    proportion_first_invite_LTC_attend,
+    proportion_first_attend_HOC_sent
   )
 
 rm(
