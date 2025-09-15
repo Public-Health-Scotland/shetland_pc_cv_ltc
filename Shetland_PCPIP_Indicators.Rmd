@@ -61,7 +61,7 @@ all_data <- monthly_summary |>
       pivot_wider(
         id_cols = c(PracticeID, quarter_start),
         names_from = DerivedEventType,
-        values_from = event_type_proportion,
+        values_from = proportion_quarterly_event_type,
         values_fill = 0.0
       ),
     by = join_by(census_date == quarter_start, PracticeID),
@@ -174,7 +174,7 @@ This looks at the prevalence of patients identified as having Cardiovascular Dis
 cv_prev_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~list_prev,
+  y = ~proportion_list_LTC_prevalence,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -185,7 +185,7 @@ cv_prev_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>CV Prevalence:", percent(list_prev, accuracy = 0.1),
+    "<br>CV Prevalence:", percent(proportion_list_LTC_prevalence, accuracy = 0.1),
     "<br>List size:", list_pop,
     "<br>CV patients count:", ltc_prev_count
   )
@@ -207,7 +207,7 @@ cv_prev_plotly <- plot_ly(
 ```{r cv_prev_dt}
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "list_prev",
+  main_var = "proportion_list_LTC_prevalence",
   main_name = "CV prevalence percentage",
   percentage = TRUE
 )
@@ -457,7 +457,7 @@ DENOMINATOR: Count of medication reviews completed
 pharm_6_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~pharmacist_proportion,
+  y = ~proportion_pharmacist_reviews,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -468,7 +468,7 @@ pharm_6_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
+    "<br>Percentage by pharmacist:", percent(proportion_pharmacist_reviews, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Monthly percentage of reviews completed by a pharmacist", 25),
@@ -484,7 +484,7 @@ pharm_6_plotly <- plot_ly(
 # Create the DT datatable
 pharm_6_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "pharmacist_proportion",
+  main_var = "proportion_pharmacist_reviews",
   main_name = "Percentage by pharmacist",
   percentage = TRUE
 )
@@ -532,7 +532,7 @@ pharm_9_plotly <- quarterly_event_type |>
       plot_ly(
         data = practice_data,
         x = ~quarter_start,
-        y = ~event_type_proportion,
+        y = ~proportion_quarterly_event_type,
         color = ~DerivedEventType,
         colors = event_type_colours,
         symbol = ~PracticeID,
@@ -545,7 +545,7 @@ pharm_9_plotly <- quarterly_event_type |>
         text = ~ paste(
           "Quarter start:", quarter_start,
           "<br>Event type:", DerivedEventType,
-          "<br>Percentage:", round(event_type_proportion * 100, 1), "%"
+          "<br>Percentage:", round(proportion_quarterly_event_type * 100, 1), "%"
         ),
         legendgroup = ~DerivedEventType,
         name = ~DerivedEventType,

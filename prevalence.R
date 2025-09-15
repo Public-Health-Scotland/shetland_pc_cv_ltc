@@ -312,7 +312,7 @@ monthly_summary <- census_data |>
       closest(census_date >= Date)
     )
   ) |>
-  mutate(list_prev = ltc_prev_count / list_pop) |>
+  mutate(proportion_list_LTC_prevalence = ltc_prev_count / list_pop) |>
   select(
     PracticeID,
     census_date,
@@ -320,7 +320,7 @@ monthly_summary <- census_data |>
     ltc_countable_prev_count,
     ltc_first_invite_count,
     ltc_first_attend_count,
-    list_prev,
+    proportion_list_LTC_prevalence,
     list_pop,
     proportion_LTC_invite,
     proportion_LTC_attend,
