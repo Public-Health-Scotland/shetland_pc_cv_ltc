@@ -753,12 +753,12 @@ for (sheet_name in names(all_data_frames)) {
     wb = wb, 
     sheet = sheet_name, 
     style = percentage_styling, 
-    rows = 1:nrow(all_data_frames[[sheet_name]]),
+    rows = seq_len(nrow(all_data_frames[[sheet_name]])) + 1,
     cols = percentage_cols,
     gridExpand = TRUE
     )
+  setColWidths(wb, sheet = sheet_name, cols = seq_len(ncol(all_data_frames[[sheet_name]])), widths = "auto")
   writeDataTable(wb, sheet_name, all_data_frames[[sheet_name]])
-  setColWidths(wb, sheet = sheet_name, cols = 1:ncol(all_data_frames[[sheet_name]]), widths = "auto")
 }
 
 # Save the workbook to the specified path
