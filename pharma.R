@@ -19,7 +19,7 @@ pharmacist_reviews <- med_reviews |>
   mutate(total_events = sum(NumberOfEvents)) |>
   ungroup() |>
   filter(DerivedStaffType == "Pharmacist") |>
-  mutate(pharmacist_proportion = NumberOfEvents / total_events)
+  mutate(proportion_pharmacist_reviews = NumberOfEvents / total_events)
 
 # Summarise event type by Practice
 
@@ -37,7 +37,7 @@ monthly_event_type <- med_reviews %>%
   group_by(PracticeID, census_date) %>%
   mutate(
     TotalEvents = sum(NumberOfEvents),
-    event_type_proportion = NumberOfEvents / TotalEvents
+    proportion_monthly_event_type = NumberOfEvents / TotalEvents
   ) %>%
   ungroup() %>%
   arrange(PracticeID, census_date, DerivedEventType)
@@ -52,7 +52,7 @@ quarterly_event_type <- monthly_event_type %>%
     TotalEvents = sum(TotalEvents),
   ) %>%
   ungroup() %>%
-  mutate(event_type_proportion = NumberOfEvents / TotalEvents)
+  mutate(proportion_quarterly_event_type = NumberOfEvents / TotalEvents)
 
 # Create a named list of data frames for export
 output_list <- list(

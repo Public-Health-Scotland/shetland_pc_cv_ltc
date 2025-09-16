@@ -61,7 +61,7 @@ all_data <- monthly_summary |>
       pivot_wider(
         id_cols = c(PracticeID, quarter_start),
         names_from = DerivedEventType,
-        values_from = event_type_proportion,
+        values_from = proportion_quarterly_event_type,
         values_fill = 0.0
       ),
     by = join_by(census_date == quarter_start, PracticeID),
@@ -174,7 +174,7 @@ This looks at the prevalence of patients identified as having Cardiovascular Dis
 cv_prev_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~list_prev,
+  y = ~proportion_list_LTC_prevalence,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -185,7 +185,7 @@ cv_prev_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>CV Prevalence:", percent(list_prev, accuracy = 0.1),
+    "<br>CV Prevalence:", percent(proportion_list_LTC_prevalence, accuracy = 0.1),
     "<br>List size:", list_pop,
     "<br>CV patients count:", ltc_prev_count
   )
@@ -207,7 +207,7 @@ cv_prev_plotly <- plot_ly(
 ```{r cv_prev_dt}
 cv_prev_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "list_prev",
+  main_var = "proportion_list_LTC_prevalence",
   main_name = "CV prevalence percentage",
   percentage = TRUE
 )
@@ -232,7 +232,7 @@ DENOMINATOR: Count of people with CV LTCs.
 cv_ctac_1_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_invite_prop,
+  y = ~proportion_LTC_invite,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -243,7 +243,7 @@ cv_ctac_1_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID, 
     "<br>Month:", census_date,
-    "<br>Invite percentage:", percent(ltc_invite_prop, accuracy = 0.1)
+    "<br>Invite percentage:", percent(proportion_LTC_invite, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -259,7 +259,7 @@ cv_ctac_1_plotly <- plot_ly(
 ```{r cv_ctac_1_dt}
 cv_ctac_1_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_invite_prop",
+  main_var = "proportion_LTC_invite",
   main_name = "Invite Percentage",
   percentage = TRUE
 )
@@ -284,7 +284,7 @@ DENOMINATOR: Count of people with CV LTCs.
 cv_ctac_2_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_attend_prop,
+  y = ~proportion_LTC_attend,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -295,7 +295,7 @@ cv_ctac_2_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Attend percentage:", percent(ltc_attend_prop, accuracy = 0.1)
+    "<br>Attend percentage:", percent(proportion_LTC_attend, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -312,7 +312,7 @@ cv_ctac_2_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_2_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_attend_prop",
+  main_var = "proportion_LTC_attend",
   main_name = "Attend percentage",
   percentage = TRUE
 )
@@ -339,7 +339,7 @@ Note that this indicator does not use the 15-month 'grace period' from diagnosis
 cv_ctac_3_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_first_invite_attend_prop,
+  y = ~proportion_first_invite_LTC_attend,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -352,7 +352,7 @@ cv_ctac_3_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>Invites sent:", ltc_first_invite_count,
-    "<br>Attend percentage:", percent(ltc_first_invite_attend_prop, accuracy = 0.1)
+    "<br>Attend percentage:", percent(proportion_first_invite_LTC_attend, accuracy = 0.1)
   )
 ) |>
   layout(
@@ -369,7 +369,7 @@ cv_ctac_3_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_3_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_first_invite_attend_prop",
+  main_var = "proportion_first_invite_LTC_attend",
   main_name ="Attend percentage",
   other_vars = "ltc_first_invite_count",
   other_names = "Invites sent",
@@ -398,7 +398,7 @@ Note that this indicator does not use the 15-month 'grace period' from diagnosis
 cv_ctac_4_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~ltc_first_attend_hoc_sent_prop,
+  y = ~proportion_first_attend_HOC_sent,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -411,7 +411,7 @@ cv_ctac_4_plotly <- plot_ly(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
     "<br>First attendances (in the last 15 months):", ltc_first_attend_count,
-    "<br>HoC sent percentage:", percent(ltc_first_attend_hoc_sent_prop, accuracy = 0.1)
+    "<br>HoC sent percentage:", percent(proportion_first_attend_HOC_sent, accuracy = 0.1)
   )
 ) |>
   layout(
@@ -428,7 +428,7 @@ cv_ctac_4_plotly <- plot_ly(
 # Create the DT datatable
 cv_ctac_4_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "ltc_first_attend_hoc_sent_prop",
+  main_var = "proportion_first_attend_HOC_sent",
   main_name = "HoC sent percentage",
   other_vars = "ltc_first_attend_count",
   other_names = "First attendances - last 15m",
@@ -457,7 +457,7 @@ DENOMINATOR: Count of medication reviews completed
 pharm_6_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~pharmacist_proportion,
+  y = ~proportion_pharmacist_reviews,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -468,7 +468,7 @@ pharm_6_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Percentage by pharmacist:", percent(pharmacist_proportion, accuracy = 0.1))
+    "<br>Percentage by pharmacist:", percent(proportion_pharmacist_reviews, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Monthly percentage of reviews completed by a pharmacist", 25),
@@ -484,7 +484,7 @@ pharm_6_plotly <- plot_ly(
 # Create the DT datatable
 pharm_6_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "pharmacist_proportion",
+  main_var = "proportion_pharmacist_reviews",
   main_name = "Percentage by pharmacist",
   percentage = TRUE
 )
@@ -532,7 +532,7 @@ pharm_9_plotly <- quarterly_event_type |>
       plot_ly(
         data = practice_data,
         x = ~quarter_start,
-        y = ~event_type_proportion,
+        y = ~proportion_quarterly_event_type,
         color = ~DerivedEventType,
         colors = event_type_colours,
         symbol = ~PracticeID,
@@ -545,7 +545,7 @@ pharm_9_plotly <- quarterly_event_type |>
         text = ~ paste(
           "Quarter start:", quarter_start,
           "<br>Event type:", DerivedEventType,
-          "<br>Percentage:", round(event_type_proportion * 100, 1), "%"
+          "<br>Percentage:", round(proportion_quarterly_event_type * 100, 1), "%"
         ),
         legendgroup = ~DerivedEventType,
         name = ~DerivedEventType,
@@ -640,7 +640,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_90_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~prop_review_90,
+  y = ~proportion_pharma_review_90,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -651,7 +651,7 @@ pharma1_90_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Proportion Reviewed (90 days):", percent(prop_review_90, accuracy = 0.1)
+    "<br>Proportion Reviewed (90 days):", percent(proportion_pharma_review_90, accuracy = 0.1)
     )
 ) |>
   layout(
@@ -667,7 +667,7 @@ pharma1_90_plotly <- plot_ly(
 ```{r pharma1_90_dt}
 pharma1_90_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "prop_review_90",
+  main_var = "proportion_pharma_review_90",
   main_name = "Proportion Reviewed (90 days)",
   percentage = TRUE
 )
@@ -692,7 +692,7 @@ DENOMINATOR: Total number of people who have been issued a repeat prescription i
 pharma1_180_plotly <- plot_ly(
   shared_monthly_summary,
   x = ~census_date,
-  y = ~review_180_prop,
+  y = ~proportion_pharma_review_180,
   color = ~PracticeID,
   symbol = ~PracticeID,
   colors = practice_colours,
@@ -703,7 +703,7 @@ pharma1_180_plotly <- plot_ly(
   text = ~ paste(
     "Practice:", PracticeID,
     "<br>Month:", census_date,
-    "<br>Proportion Reviewed (180 days):", percent(review_180_prop, accuracy = 0.1))
+    "<br>Proportion Reviewed (180 days):", percent(proportion_pharma_review_180, accuracy = 0.1))
 ) |>
   layout(
     title = str_wrap("Proportion Reviewed (180 days)", 25),
@@ -718,7 +718,7 @@ pharma1_180_plotly <- plot_ly(
 ```{r pharma1_180_dt}
 pharma1_180_dt <- make_dt(
   shared_data = shared_monthly_summary,
-  main_var = "review_180_prop",
+  main_var = "proportion_pharma_review_180",
   main_name = "Proportion Reviewed (180 days)",
   percentage = TRUE
 )
@@ -733,21 +733,32 @@ pharma1_180_dt
 ```{r export-all-data-frames, message=FALSE, warning=FALSE}
 # Create the named list of data frames and their sheet names
 all_data_frames <- list(
-  monthly_event_type = monthly_event_type,
   monthly_summary = monthly_summary,
-  pharma_1_monthly = pharma_1_monthly,
   pharmacist_reviews = pharmacist_reviews,
-  quarterly_event_type = quarterly_event_type
+  monthly_event_type = monthly_event_type,
+  quarterly_event_type = quarterly_event_type,
+  pharma_1_monthly = pharma_1_monthly
 )
 
 # Create a new workbook
 wb <- createWorkbook()
 
 # Add each data frame as a sheet and set column widths to auto
+percentage_styling <- createStyle(numFmt = "0.0%")
+
 for (sheet_name in names(all_data_frames)) {
   addWorksheet(wb, sheet_name)
-  writeData(wb, sheet_name, all_data_frames[[sheet_name]])
-  setColWidths(wb, sheet = sheet_name, cols = 1:ncol(all_data_frames[[sheet_name]]), widths = "auto")
+  percentage_cols <- which(str_starts(colnames(all_data_frames[[sheet_name]]), "proportion_"))
+  addStyle(
+    wb = wb, 
+    sheet = sheet_name, 
+    style = percentage_styling, 
+    rows = seq_len(nrow(all_data_frames[[sheet_name]])) + 1,
+    cols = percentage_cols,
+    gridExpand = TRUE
+    )
+  setColWidths(wb, sheet = sheet_name, cols = seq_len(ncol(all_data_frames[[sheet_name]])), widths = "auto")
+  writeDataTable(wb, sheet_name, all_data_frames[[sheet_name]])
 }
 
 # Save the workbook to the specified path
